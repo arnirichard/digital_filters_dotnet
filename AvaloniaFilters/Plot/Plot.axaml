@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="AvaloniaFilters.Plot">
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition/>
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+
+		<Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+			<Grid Name="grid">
+				<Image Name="image"/>
+			</Grid>
+
+		</Border>
+
+		<Canvas Name="verticalLabels" Grid.Row="0" Grid.Column="0"/>
+
+		<Canvas Name="horizontalLabels" Grid.Column="1" Grid.Row="1"/>
+	</Grid>
+</UserControl>
