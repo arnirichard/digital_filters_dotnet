@@ -8,22 +8,22 @@ namespace Filters
 {
     internal class LinkwitzReilly
     {
-        internal static IIRFilter BandPass(int f_c, int f_s, double bw)
+        internal static IIRFilter BandPass(int order, int f_c, int f_s, double bw)
         {
             throw new NotImplementedException();
         }
 
-        internal static IIRFilter BandStop(int f_c, int f_s, double bw)
+        internal static IIRFilter BandStop(int order, int f_c, int f_s, double bw)
         {
             throw new NotImplementedException();
         }
 
-        internal static IIRFilter HighPass(int f_c, int f_s)
+        internal static IIRFilter HighPass(int order, int f_c, int f_s)
         {
             throw new NotImplementedException();
         }
 
-        internal static IIRFilter LowPass(int f_c, int f_s)
+        internal static IIRFilter LowPass(int order, int f_c, int f_s)
         {
             throw new NotImplementedException();
         }

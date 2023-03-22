@@ -1,5 +1,4 @@
-﻿using Filters.FilterTypes;
-using System;
+﻿using System;
 using System.Data;
 using System.Numerics;
 using System.Text;
@@ -41,7 +40,7 @@ namespace Filters
             Nominator = new Polynomial(b.Reverse().ToArray());
             List<double> denomCoeffs = new List<double>() { 1 };
             denomCoeffs.AddRange(a);
-            denomCoeffs.Reverse();
+            //denomCoeffs.Reverse();
             Denominator = new Polynomial(denomCoeffs.ToArray());
             Poles = Denominator.Roots();
             Zeros = Nominator.Roots();
@@ -53,16 +52,33 @@ namespace Filters
 
             sb.Append("y_n = ");
 
+            for(int i = 0; i < B.Length; i++)
+            {
+                sb.Append((B[0] < 0 ? "- " : (i > 0 ? " + " : "")) + string.Format("{0}x_n{1}",
+                    Math.Abs(B[0]),
+                    i == 0 ? "" : -i));
+            }
+
+            for (int i = 0; i < A.Length; i++)
+            {
+                sb.Append((A[0] < 0 ? " - " : " + ") +
+                    string.Format("{0}y_n{1}",
+                        Math.Abs(A[0]),
+                        -(i+1)));
+            }
+
             return sb.ToString();
         }
 
         public Complex[] GetResponse(double[] omega)
         {
             Complex[] result = new Complex[omega.Length];
+            Complex c;
 
-            for(int i = 0; i < result.Length; i++)
+            for (int i = 0; i < result.Length; i++)
             {
-                result[i] = Nominator.Evaluate(omega[i]) / Denominator.Evaluate(omega[i]);
+                c = new Complex(Math.Cos(-omega[i]), Math.Sin(-omega[i]));
+                result[i] = Nominator.Evaluate(c) / Denominator.Evaluate(c);
             }
 
             return result;

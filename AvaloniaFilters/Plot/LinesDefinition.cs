@@ -13,9 +13,9 @@ namespace AvaloniaFilters
         public float Value { get; private set; }
         public float Interval { get; private set; }
         public bool Solid { get; private set; }
-        public int Color { get; private set; }
+        public uint Color { get; private set; }
         public int MinPointsSpacing { get; private set; }
-        public LinesDefinition(float value, float interval, bool solid, int color, int minPointSpacing = 10)
+        public LinesDefinition(float value, float interval, bool solid, uint color, int minPointSpacing = 10)
         {
             Value = value;
             Interval = interval;

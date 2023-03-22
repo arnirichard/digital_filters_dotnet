@@ -194,7 +194,7 @@ namespace Filters
             if (f_s <= 0)
                 throw new Exception("Sampling frequency must be positive.");
 
-            if (f_c < 0 || f_c >= f_s/2)
+            if (f_c < 0 || f_c > f_s/2)
                 throw new Exception("Cut-off must be positive and less than half F_s.");
 
             if (order < 1)

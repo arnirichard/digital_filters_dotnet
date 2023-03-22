@@ -1,8 +1,13 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using AvaloniaFilters.Utils;
+using Filters;
 using System;
+using System.Collections.Generic;
+using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,9 +15,9 @@ namespace AvaloniaFilters
 {
     public enum ScaleType
     {
-        Linear,
-        Log2,
-        Log10
+        Linear = 1,
+        Log2 = 2,
+        Log10 = 10
     }
 
     public partial class Plot : UserControl
@@ -27,8 +32,8 @@ namespace AvaloniaFilters
         public ScaleType XScaleType { get; set; } = ScaleType.Linear;
         public NumberRange<double>? YDisplayRange { get; set; }
         public NumberRange<double>? XDisplayRange { get; set; }
-        public LinesDefinition[]? YValueLines { get; set; }
-        public LinesDefinition[]? XValueLines { get; set; }
+        public LinesDefinition[]? HorizontalLines { get; set; }
+        public LinesDefinition[]? VerticalLines { get; set; }
 
         int currentWidth, currentHeight;
 
@@ -62,20 +67,56 @@ namespace AvaloniaFilters
 
             int width = currentWidth = (int)grid.Bounds.Width;
             int height = currentHeight = (int)grid.Bounds.Height;
-            WriteableBitmap? wbitmap = await CreateBitmap(vm, width, height);
+            DrawBitmapJob? wbitmap = await CreateBitmap(vm, width, height);
 
             if(wbitmap != null && 
                 width == currentWidth &&
                 height == currentHeight)
             {
-                image.Source = wbitmap;
+                image.Source = wbitmap.Bitmap;
+                AddLabels(belowLabels, wbitmap.VerticalLines, true);
+                AddLabels(sideLabels, wbitmap.HorizontalLines, false);
             }
         }
 
-        async Task<WriteableBitmap?> CreateBitmap(PlotViewModel vm, int width, int height)
+        void AddLabels(Canvas canvas, List<PlotLine> plotLines, bool below)
         {
-            TaskCompletionSource<WriteableBitmap?> taskCompletionSource =
-                new TaskCompletionSource<WriteableBitmap?>();
+            canvas.Children.Clear();
+
+            foreach (var plotLine in plotLines)
+            {
+                TextBlock textBlock = new TextBlock()
+                {
+                    Text = plotLine.Value.ToString("0.###"),
+                    TextAlignment = TextAlignment.Center,
+                    Foreground = new SolidColorBrush(Colors.Black)
+                };
+                if (below)
+                {
+                    textBlock.Width = 100;
+                    Canvas.SetLeft(textBlock, plotLine.Position - 50);
+                    Canvas.SetTop(textBlock, 3);
+                }
+                else
+                {
+                    Canvas.SetRight(textBlock, 5);
+                    Canvas.SetTop(textBlock, plotLine.Position - 8);
+                }
+                canvas.Children.Add(textBlock);
+            }
+        }
+
+        class DrawBitmapJob
+        {
+            public WriteableBitmap Bitmap;
+            public List<PlotLine> HorizontalLines;
+            public List<PlotLine> VerticalLines;
+        }
+
+        async Task<DrawBitmapJob?> CreateBitmap(PlotViewModel vm, int width, int height)
+        {
+            TaskCompletionSource<DrawBitmapJob?> taskCompletionSource =
+                new TaskCompletionSource<DrawBitmapJob?>();
 
             ThreadPool.QueueUserWorkItem(delegate
             {
@@ -87,11 +128,31 @@ namespace AvaloniaFilters
                         Avalonia.Platform.PixelFormat.Bgra8888,
                         Avalonia.Platform.AlphaFormat.Unpremul);
 
-                    //writeableBitmap.WriteColor(Beige);
+                    NumberRange<double> xRange = vm.XRange ?? new NumberRange<double>(1, vm.Y.Length);
+                    double[] x = vm.X ?? 1D.GetLinearRange(vm.Y.Length, vm.Y.Length);
 
-                    taskCompletionSource.SetResult(writeableBitmap);
+                    AxisData yAxisData = new AxisData(vm.Y, vm.YRange, vm.YRange, (int)YScaleType);
+                    AxisData xAxisData = new AxisData(x, xRange, xRange, (int)XScaleType);
+
+                    List<PlotLine> horizontalPlotLines = new();
+                    List<PlotLine> verticalPlotLines = new();
+
+                    if (HorizontalLines != null)
+                        horizontalPlotLines = writeableBitmap.PlotHorizontalLines(yAxisData.VisibleRange, (int)YScaleType, HorizontalLines);
+
+                    if(VerticalLines != null)
+                        verticalPlotLines = writeableBitmap.PlotVerticallLines(xAxisData.VisibleRange, (int)XScaleType, VerticalLines);
+
+                    writeableBitmap.PlotXY(Black, yAxisData, xAxisData);
+
+                    taskCompletionSource.SetResult(new DrawBitmapJob()
+                    {
+                        Bitmap = writeableBitmap,
+                        HorizontalLines = horizontalPlotLines,
+                        VerticalLines = verticalPlotLines
+                    });
                 }
-                catch
+                catch(Exception ex)
                 {
                     taskCompletionSource.SetResult(null);   
                 }

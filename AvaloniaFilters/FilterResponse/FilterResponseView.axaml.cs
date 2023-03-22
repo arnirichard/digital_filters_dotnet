@@ -25,6 +25,22 @@ namespace AvaloniaFilters
             cutoffFreqSlider.PropertyChanged += CutoffFreqSlider_PropertyChanged;
             cutoffFreqTextBlock.Text = ((int)cutoffFreqSlider.Value).ToString();
             CreateFilter();
+
+            magnitudePlot.HorizontalLines = new LinesDefinition[]
+            {
+                new LinesDefinition(0, 1, true, Plot.Beige)
+            };
+
+            phasePlot.VerticalLines = magnitudePlot.VerticalLines = new LinesDefinition[]
+            {
+                new LinesDefinition(50, 0, true, Plot.Beige),
+                new LinesDefinition(100, 0, true, Plot.Beige),
+                new LinesDefinition(250, 0, true, Plot.Beige),
+                new LinesDefinition(500, 0, true, Plot.Beige),
+                new LinesDefinition(1000, 0, true, Plot.Beige),
+                new LinesDefinition(2000, 0, true, Plot.Beige),
+                new LinesDefinition(4000, 0, true, Plot.Beige)
+            };
         }
 
         private void CutoffFreqSlider_PropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
@@ -55,7 +71,7 @@ namespace AvaloniaFilters
                     (FilterType)filterTypeCombo.SelectedItem,
                     orderCombo.SelectedIndex+1, 
                     (int)cutoffFreqSlider.Value, 
-                    10000);
+                    vm.Fs);
                 vm.SetFilter(filter);
             }
         }

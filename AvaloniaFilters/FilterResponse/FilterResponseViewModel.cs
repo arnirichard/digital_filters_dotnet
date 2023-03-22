@@ -12,6 +12,7 @@ namespace AvaloniaFilters
 {
     internal class FilterResponseViewModel : ViewModelBase
     {
+        public int Fs { get; set; } = 10000;
         public Complex[]? Zeros { get; set; }
         public Complex[]? Poles { get; set; }
         public IIRFilter? Filter { get; set; }
@@ -24,10 +25,21 @@ namespace AvaloniaFilters
             Poles = filter.Poles;
             Filter = filter;
 
-            double[] omega = 0D.GetRange(Math.PI, 100);
+            double[] omega = 0.1D.GetLinearRange(Math.PI, 300);
             double[] freqs = omega.Select(o => o * filter.Fs / 2 / Math.PI).ToArray();
             Complex[] response = filter.GetResponse(omega);
-            Magnitude = new PlotViewModel(response.Select(r => r.Magnitude).ToArray(),freqs);
+            Magnitude = new PlotViewModel(response.Select(r => Math.Log10(r.Magnitude)).ToArray(),freqs);
+            double peak = response[0].Magnitude;
+            double peakFreq = -1;
+            for(int i = 0; i< response.Length; i++)
+            {
+                if (response[i].Magnitude > peak)
+                {
+                    peak = response[i].Magnitude;
+                    peakFreq = freqs[i];
+                }
+                    
+            }
             Phase = new PlotViewModel(response.Select(r => r.Phase).ToArray(), freqs);
 
             this.RaisePropertyChanged("Zeros");
