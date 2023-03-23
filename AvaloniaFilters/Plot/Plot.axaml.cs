@@ -29,7 +29,7 @@ namespace AvaloniaFilters
         public static uint Blue = uint.Parse("FF0000FF", System.Globalization.NumberStyles.HexNumber);
         public ScaleType YScaleType { get; set; } = ScaleType.Linear;
         public ScaleType XScaleType { get; set; } = ScaleType.Linear;
-        public double? MinYDisplayRangeEnd, MaxYDisplayRangeStart;
+        public double? MinYDisplayRangeEnd, MinYDisplayRangeStart;
         public LinesDefinition[]? HorizontalLines { get; set; }
         public LinesDefinition[]? VerticalLines { get; set; }
         public string? XUnit, YUnit;
@@ -129,11 +129,9 @@ namespace AvaloniaFilters
 
                     NumberRange<double> xRange = vm.XRange ?? new NumberRange<double>(1, vm.Y.Length);
                     double[] x = vm.X ?? 1D.GetLinearRange(vm.Y.Length, vm.Y.Length);
-                    NumberRange<double> yDisplayRange = MinYDisplayRangeEnd is double d
-                        ? new NumberRange<double>(
-                                Math.Max(MaxYDisplayRangeStart ?? vm.YRange.Start, vm.YRange.Start),
-                                d > vm.YRange.End ? d: vm.YRange.End)
-                        : vm.YRange;
+                    NumberRange<double> yDisplayRange = new NumberRange<double>(
+                                Math.Max(MinYDisplayRangeStart ?? vm.YRange.Start, vm.YRange.Start),
+                                Math.Max(MinYDisplayRangeEnd ?? vm.YRange.End+1, vm.YRange.End+1));
 
                     AxisData yAxisData = new AxisData(vm.Y, vm.YRange, yDisplayRange, (int)YScaleType);
                     AxisData xAxisData = new AxisData(x, xRange, xRange, (int)XScaleType);

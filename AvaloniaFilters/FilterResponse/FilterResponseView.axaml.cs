@@ -23,7 +23,7 @@ namespace AvaloniaFilters
             orderCombo.SelectionChanged += OrderCombo_SelectionChanged;
             cutoffFreqSlider.PropertyChanged += Slider_PropertyChanged;
             bandwidthSlider.PropertyChanged += Slider_PropertyChanged;
-            linearGainSlider.PropertyChanged += Slider_PropertyChanged;
+            gainSlider.PropertyChanged += Slider_PropertyChanged;
             qSlider.PropertyChanged += Slider_PropertyChanged;
 
             magnitudePlot.HorizontalLines = new LinesDefinition[]
@@ -40,7 +40,7 @@ namespace AvaloniaFilters
                 new LinesDefinition(0, 50, true, Plot.Beige),
             };
 
-            magnitudePlot.MaxYDisplayRangeStart = -100;
+            magnitudePlot.MinYDisplayRangeStart = -100;
             magnitudePlot.MinYDisplayRangeEnd = 1;
             phasePlot.XUnit = magnitudePlot.XUnit = "Hz";
             magnitudePlot.YUnit = "dB";
@@ -86,8 +86,9 @@ namespace AvaloniaFilters
 
         void UpdatePanelVisibility()
         {
-            bwPanel.IsVisible = filterPassTypeCombo.SelectedItem is FilterPassType pt &&
-                (pt == FilterPassType.BandPass || pt == FilterPassType.BandStop);
+            bwPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft6 &&
+                filterPassTypeCombo.SelectedItem is FilterPassType pt &&
+                (pt == FilterPassType.BandPass || pt == FilterPassType.BandStop || ft6 == FilterType.Equalization);
             linearGainPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft &&
                 ft == FilterType.Equalization;
             rippleFactorPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft2 &&
@@ -137,7 +138,7 @@ namespace AvaloniaFilters
                         Fc = (int)cutoffFreqSlider.Value,
                         BW = bandwidthSlider.Value,
                         Order = order,
-                        LinearGain = linearGainSlider.Value,
+                        LinearGain = Math.Pow(10, gainSlider.Value/20),
                         RippleFactor = rippleFactorSlider.Value,
                         Q = qSlider.Value
                     },

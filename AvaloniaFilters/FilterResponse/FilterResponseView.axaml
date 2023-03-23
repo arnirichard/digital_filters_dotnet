@@ -60,14 +60,14 @@
 
 				<StackPanel x:Name="linearGainPanel">
 					<WrapPanel>
-						<TextBlock VerticalAlignment="Center" Margin="10">Linear gain:</TextBlock>
+						<TextBlock VerticalAlignment="Center" Margin="10">Gain (dB):</TextBlock>
 						<TextBlock VerticalAlignment="Center" Margin="10"
-								   Text="{Binding Value,ElementName=linearGainSlider}"/>
+								   Text="{Binding Value,ElementName=gainSlider}"/>
 					</WrapPanel>
 
-					<Slider x:Name="linearGainSlider" Value="2"
-						Minimum="1" Maximum="100" TickFrequency="1"
-						SmallChange="10"
+					<Slider x:Name="gainSlider" Value="3"
+						Minimum="-30" Maximum="30" TickFrequency="1"
+						SmallChange="11"
 						IsSnapToTickEnabled="True"
 						HorizontalAlignment="Stretch"
 						Margin="10, 0"

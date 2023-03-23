@@ -19,11 +19,11 @@ namespace Filters
                 throw new Exception("LinearGain not specified");
             
             double bw = parameters.BW ?? 100;
-            int f_c = parameters.Fc;
-            int f_s = parameters.Fs;
+            int fc = parameters.Fc;
+            int fs = parameters.Fs;
 
-            double alpha = Math.Tan(Math.PI * bw / f_s);
-            double beta = -Math.Cos(2*Math.PI * f_c / f_s);
+            double alpha = Math.Tan(Math.PI * bw / fs);
+            double beta = -Math.Cos(2*Math.PI * fc / fs);
             double g = (double)parameters.LinearGain;
 
             double D = g < 1 ? alpha + g : alpha + 1;
