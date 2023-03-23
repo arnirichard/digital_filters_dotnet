@@ -20,10 +20,11 @@
 				<TextBlock VerticalAlignment="Center" Margin="10"
 						   Text="{Binding Fs}"/>
 			</WrapPanel>
-			<WrapPanel>
+			<StackPanel Orientation="Vertical">
 				<TextBlock VerticalAlignment="Center" Margin="10">Filter</TextBlock>
 				<ComboBox x:Name="filterTypeCombo" SelectedIndex="0"/>
-			</WrapPanel>
+				<ComboBox x:Name="filterPassTypeCombo" SelectedIndex="0"/>
+			</StackPanel>
 			<WrapPanel>
 				<TextBlock VerticalAlignment="Center" Margin="10">Order</TextBlock>
 				<ComboBox x:Name="orderCombo" SelectedIndex="0"/>

@@ -13,8 +13,19 @@ namespace Filters
         public static readonly double Alpha = -2 * (Math.Cos(5 * Math.PI / 8) + Math.Cos(7 * Math.PI / 8));
         public static readonly double Beta = 2 * (1 + 2 * Math.Cos(5 * Math.PI / 8) * Math.Cos(7 * Math.PI / 8));
 
-        internal static IIRFilter BandStop(int order, int f_c, int f_s, double bw)
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.BandStop)]
+        internal static IIRFilter BandStop(FilterParameters parameters) //int order, int f_c, int f_s, double bw)
         {
+            if (parameters.Order == null)
+                throw new Exception("Order not specified");
+            if (parameters.BW == null)
+                throw new Exception("Bandwidth not specified");
+
+            int order = parameters.Order ?? 2;
+            double bw = parameters.BW ?? 100;
+            int f_c = parameters.Fc;
+            int f_s = parameters.Fs;
+
             if (order <= 3)
                 order = 2;
             else if (order != 4)
@@ -69,8 +80,19 @@ namespace Filters
             return new IIRFilter(a, b, f_s, f_c);
         }
 
-        public static IIRFilter BandPass(int order, int f_c, int f_s, double bw)
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.BandPass)]
+        public static IIRFilter BandPass(FilterParameters parameters)
         {
+            if (parameters.Order == null)
+                throw new Exception("Order not specified");
+            if (parameters.BW == null)
+                throw new Exception("Bandwidth not specified");
+
+            int order = parameters.Order ?? 2;
+            double bw = parameters.BW ?? 100;
+            int f_c = parameters.Fc;
+            int f_s = parameters.Fs;
+
             if (order <= 3)
                 order = 2;
             else if (order != 4)
@@ -125,10 +147,16 @@ namespace Filters
             return new IIRFilter(a, b, f_s, f_c);
         }
 
-        public static IIRFilter HighPass(int order, int f_c, int f_s)
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.HighPass)]
+        public static IIRFilter HighPass(FilterParameters parameters)
         {
-            if (f_s <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+            if (parameters.Order == null)
+                throw new Exception("Order not specified");
+
+            int order = parameters.Order ?? 2;
+            int f_c = parameters.Fc;
+            int f_s = parameters.Fs;
+
 
             double gamma = Math.Tan(f_c * Math.PI / f_s);
             double D;
@@ -189,16 +217,24 @@ namespace Filters
             return new IIRFilter(a, b, f_s, f_c);
         }
 
-        public static IIRFilter LowPass(int order, int f_c, int f_s)
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.LowPass)]
+        public static IIRFilter LowPass(FilterParameters parameters)
         {
+            if (parameters.Order == null)
+                throw new Exception("Order not specified");
+
+            if(parameters.Order < 1 || parameters.Order > 4)
+                throw new Exception("Order must be beetween 1 and 4");
+
+            int order = parameters.Order ?? 2;
+            int f_c = parameters.Fc;
+            int f_s = parameters.Fs;
+
             if (f_s <= 0)
                 throw new Exception("Sampling frequency must be positive.");
 
             if (f_c < 0 || f_c > f_s/2)
                 throw new Exception("Cut-off must be positive and less than half F_s.");
-
-            if (order < 1)
-                order = 1;
 
             double gamma = Math.Tan(f_c * Math.PI / f_s);
             double D;

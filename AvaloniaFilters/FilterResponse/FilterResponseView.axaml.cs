@@ -15,7 +15,9 @@ namespace AvaloniaFilters
             DataContext = new FilterResponseViewModel();
 
             filterTypeCombo.Items = Enum.GetValues(typeof(FilterType)).Cast<FilterType>();
+            filterPassTypeCombo.Items = Enum.GetValues(typeof(FilterPassType)).Cast<FilterPassType>();
             filterTypeCombo.SelectedIndex = 0;
+            filterPassTypeCombo.SelectedIndex = 1;
             orderCombo.Items = Enumerable.Range(1, 4);
             orderCombo.SelectedIndex = 0;
             CreateFilter();
@@ -67,11 +69,16 @@ namespace AvaloniaFilters
             if (DataContext is FilterResponseViewModel vm &&
                 filterTypeCombo.SelectedItem is FilterType)
             {
-                IIRFilter filter = IIRFilter.CreateLowPass(
+                IIRFilter? filter = IIRFilter.CreateFilter(
                     (FilterType)filterTypeCombo.SelectedItem,
-                    orderCombo.SelectedIndex+1, 
-                    (int)cutoffFreqSlider.Value, 
-                    vm.Fs);
+                    new FilterParameters(order: orderCombo.SelectedIndex + 1,
+                        fs: vm.Fs,
+                        fc: (int)cutoffFreqSlider.Value),
+                    filterPassTypeCombo.SelectedItem is null 
+                        ? FilterPassType.None 
+                        : (FilterPassType)filterPassTypeCombo.SelectedItem
+                );
+                    
                 vm.SetFilter(filter);
             }
         }

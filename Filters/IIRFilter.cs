@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 
 namespace Filters
@@ -19,6 +22,40 @@ namespace Filters
         Shelf
     }
 
+    public enum FilterPassType
+    {
+        None,
+        LowPass,
+        HighPass,
+        BandPass,
+        BandStop
+    }
+
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    class IIRFilterAttr: Attribute
+    {
+        public FilterType FilterType;
+        public FilterPassType FilterPassType;
+
+        public IIRFilterAttr(FilterType filterType, FilterPassType filterPassType = FilterPassType.None)
+        {
+            FilterType = filterType;
+            FilterPassType = filterPassType;
+        }
+
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            return obj is IIRFilterAttr fc &&
+                fc.FilterType == FilterType &&
+                fc.FilterPassType == FilterPassType;
+        }
+
+        public override int GetHashCode()
+        {
+            return 100*(int)FilterType + (int)FilterPassType;
+        }
+    }
+
     public class IIRFilter
     {
         // y_n = b_0 * x_n + b_1 * x_n-1 + ... + b_k * x_n-k + a_0 * y_n-1 + a_1 * y_n-2 + ... + a_m * y_n-m-1
@@ -30,9 +67,12 @@ namespace Filters
         public readonly Polynomial Nominator, Denominator;
         // Sampling rate, cut-off freq
         public readonly int Fs, Fc;
+        public readonly double? BandWidth;
 
-        public IIRFilter(double[] a, double[] b, int fs, int fc) 
-        { 
+        static Dictionary<IIRFilterAttr, MethodInfo> filterCreators = new();
+
+        public IIRFilter(double[] a, double[] b, int fs, int fc, double? bandWidth = null)
+        {
             A = a;
             B = b;
             Fs = fs;
@@ -40,34 +80,33 @@ namespace Filters
             Nominator = new Polynomial(b.Reverse().ToArray());
             List<double> denomCoeffs = new List<double>() { 1 };
             denomCoeffs.AddRange(a);
-            //denomCoeffs.Reverse();
             Denominator = new Polynomial(denomCoeffs.ToArray());
             Poles = Denominator.Roots();
             Zeros = Nominator.Roots();
+            BandWidth = bandWidth;
         }
 
-        public override string ToString()
+        static IIRFilter()
         {
-            StringBuilder sb = new StringBuilder();
+            InitFilterDelegates();
+        }
 
-            sb.Append("y_n = ");
-
-            for(int i = 0; i < B.Length; i++)
+        static void InitFilterDelegates()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var types = assembly.GetTypes()
+              .Where(t => string.Equals(t.Namespace, "Filters", StringComparison.Ordinal))
+              .ToArray();
+            foreach(var type in types)
             {
-                sb.Append((B[0] < 0 ? "- " : (i > 0 ? " + " : "")) + string.Format("{0}x_n{1}",
-                    Math.Abs(B[0]),
-                    i == 0 ? "" : -i));
+                MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
+                foreach (var methodInfo in methodInfos)
+                {
+                    IIRFilterAttr? attr = methodInfo.GetCustomAttributes(typeof(IIRFilterAttr), true).FirstOrDefault() as IIRFilterAttr;
+                    if (attr != null)
+                        filterCreators[attr] = methodInfo;
+                }
             }
-
-            for (int i = 0; i < A.Length; i++)
-            {
-                sb.Append((A[0] < 0 ? " - " : " + ") +
-                    string.Format("{0}y_n{1}",
-                        Math.Abs(A[0]),
-                        -(i+1)));
-            }
-
-            return sb.ToString();
         }
 
         public Complex[] GetResponse(double[] omega)
@@ -124,128 +163,45 @@ namespace Filters
             return result;
         }
 
-        public static IIRFilter CreateLowPass(FilterType type, int order, int f_c, int f_s)
+        public static IIRFilter? CreateFilter(FilterType type,
+            FilterParameters filterParameters,
+            FilterPassType passType = FilterPassType.None)
         {
-            if (order < 1)
-                order = 1;
-
-            IIRFilter result;
-
-            switch (type)
+            MethodInfo? methodInfo;
+            IIRFilterAttr attr = new IIRFilterAttr(type, passType);
+            if (filterCreators.TryGetValue(attr, out methodInfo))
             {
-                case FilterType.Butterworth:
-                    result = Butterworth.LowPass(order, f_c, f_s);
-                    break;
-                case FilterType.ChebychevTypeI:
-                    result = ChebychevI.LowPass(order, f_c, f_s);
-                    break;
-                case FilterType.ChebychevTypeII:
-                    result = ChebychevII.LowPass(order, f_c, f_s);
-                    break;
-                case FilterType.LinkwitzReilly:
-                    result = LinkwitzReilly.LowPass(order, f_c, f_s);
-                    break;
-                case FilterType.Bessel:
-                    result = Bessel.LowPass(order, f_c, f_s);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                try
+                {
+                    return methodInfo.Invoke(null, new object[] { filterParameters }) as IIRFilter;
+                }
+                catch{}
             }
-
-            return result;
+            return null;
         }
 
-        public static IIRFilter CreateHighPass(FilterType type, int order, int f_c, int f_s, double bw)
+        public override string ToString()
         {
-            if (order < 1)
-                order = 1;
+            StringBuilder sb = new StringBuilder();
 
-            IIRFilter result;
+            sb.Append("y_n = ");
 
-            switch (type)
+            for (int i = 0; i < B.Length; i++)
             {
-                case FilterType.Butterworth:
-                    result = Butterworth.HighPass(order, f_c, f_s);
-                    break;
-                case FilterType.ChebychevTypeI:
-                    result = ChebychevI.HighPass(order, f_c, f_s);
-                    break;
-                case FilterType.ChebychevTypeII:
-                    result = ChebychevII.HighPass(order, f_c, f_s);
-                    break;
-                case FilterType.LinkwitzReilly:
-                    result = LinkwitzReilly.HighPass(order, f_c, f_s);
-                    break;
-                case FilterType.Bessel:
-                    result = Bessel.HighPass(order, f_c, f_s);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                sb.Append((B[0] < 0 ? "- " : (i > 0 ? " + " : "")) + string.Format("{0}x_n{1}",
+                    Math.Abs(B[0]),
+                    i == 0 ? "" : -i));
             }
 
-            return result;
-        }
-
-        public static IIRFilter CreateBandPass(FilterType type, int order, int f_c, int f_s, double bw)
-        {
-            if (order < 1)
-                order = 1;
-
-            IIRFilter result;
-
-            switch (type)
+            for (int i = 0; i < A.Length; i++)
             {
-                case FilterType.Butterworth:
-                    result = Butterworth.BandPass(order, f_c, f_s, bw);
-                    break;
-                case FilterType.ChebychevTypeI:
-                    result = ChebychevI.BandPass(order, f_c, f_s, bw);
-                    break;
-                case FilterType.ChebychevTypeII:
-                    result = ChebychevII.BandPass(order, f_c, f_s, bw);
-                    break;
-                case FilterType.LinkwitzReilly:
-                    result = LinkwitzReilly.BandPass(order, f_c, f_s, bw);
-                    break;
-                case FilterType.Bessel:
-                    result = Bessel.BandPass(order, f_c, f_s, bw);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                sb.Append((A[0] < 0 ? " - " : " + ") +
+                    string.Format("{0}y_n{1}",
+                        Math.Abs(A[0]),
+                        -(i + 1)));
             }
 
-            return result;
-        }
-
-        public static IIRFilter CreateBandStop(FilterType type, int order, int f_c, int f_s, double bw)
-        {
-            if (order < 1)
-                order = 1;
-
-            IIRFilter result;
-
-            switch (type)
-            {
-                case FilterType.Butterworth:
-                    result = Butterworth.BandStop(order, f_c, f_s, bw);
-                    break;
-                case FilterType.ChebychevTypeI:
-                    result = ChebychevI.BandStop(order, f_c, f_s, bw);
-                    break;
-                case FilterType.ChebychevTypeII:
-                    result = ChebychevII.BandStop(order, f_c, f_s, bw);
-                    break;
-                case FilterType.LinkwitzReilly:
-                    result = LinkwitzReilly.BandStop(order, f_c, f_s, bw);
-                    break;
-                case FilterType.Bessel:
-                    result = Bessel.BandStop(order, f_c, f_s, bw);
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-
-            return result;
+            return sb.ToString();
         }
     }
 }

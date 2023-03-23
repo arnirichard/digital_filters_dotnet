@@ -9,11 +9,22 @@ namespace Filters
 {
     public static class Equalization
     {
-        public static IIRFilter Create(double linearGain, int f_c, int f_s, double bw)
+        [IIRFilterAttr(FilterType.Equalization, FilterPassType.None)]
+        public static IIRFilter Create(FilterParameters parameters)
         {
+            if (parameters.BW == null)
+                throw new Exception("Bandwidth not specified");
+
+            if (parameters.LinearGain == null)
+                throw new Exception("LinearGain not specified");
+            
+            double bw = parameters.BW ?? 100;
+            int f_c = parameters.Fc;
+            int f_s = parameters.Fs;
+
             double alpha = Math.Tan(Math.PI * bw / f_s);
             double beta = -Math.Cos(2*Math.PI * f_c / f_s);
-            double g = linearGain;
+            double g = (double)parameters.LinearGain;
 
             double D = g < 1 ? alpha + g : alpha + 1;
             double[] a = new double[2];
