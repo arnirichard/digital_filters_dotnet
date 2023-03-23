@@ -24,8 +24,10 @@ namespace Filters
             double gamma = Math.Tan(fc * Math.PI / fs);
             double bw = parameters.BW ?? 100;
 
-            double D = Q * fc * fc * Math.Pow(gamma, 4) + bw + fc * (gamma * gamma + 1) * gamma +
-                Q * (2 * fc * fc + bw * bw) * gamma * gamma + Q * fc * fc;
+            double D = Q * fc * fc * Math.Pow(gamma, 4) 
+                + bw + fc * (gamma * gamma + 1) * gamma 
+                + Q * (2 * fc * fc + bw * bw) * gamma * gamma 
+                + Q * fc * fc;
 
             double[] a = new double[order];
             double[] b = new double[order + 1];
@@ -35,11 +37,28 @@ namespace Filters
             b[2] = -2*b[0];
             b[3] = 0;
             b[4] = b[0];
-            a[0] = 2*fc*(2*Q*fc*Math.Pow(gamma,4)+bw*(gamma*gamma-1)*gamma-2*Q*fc);
-            a[1] = 2*Q*(3*fc*fc*Math.Pow(gamma, 4) - (2*fc*fc+bw*bw)*gamma*gamma+3*fc*fc);
+            a[0] = 2*fc*
+                (
+                2*Q*fc*Math.Pow(gamma,4)
+                +bw*(gamma*gamma-1)*gamma
+                -2*Q*fc
+                );
+            a[1] = 2*Q*
+                (
+                 3*fc*fc*Math.Pow(gamma, 4) 
+                 - (2*fc*fc+bw*bw)*gamma*gamma
+                 +3*fc*fc
+                );
             a[2] = 2*fc*
-                (2*Q*fc*Math.Pow(gamma,4)-bw*(gamma*gamma-1)*gamma-2*Q*fc);
-            a[3] = Q*fc*fc*Math.Pow(gamma,4)-bw*fc*(gamma*gamma+1)+Q*(2*fc*fc+bw*bw)*gamma*gamma+Q*fc*fc;
+                (
+                 2*Q*fc*Math.Pow(gamma,4)
+                 -bw*(gamma*gamma-1)*gamma
+                 -2*Q*fc
+                );
+            a[3] = Q*fc*fc*Math.Pow(gamma,4)
+                -bw*fc*(gamma*gamma+1)*gamma
+                +Q*(2*fc*fc+bw*bw)*gamma*gamma
+                +Q*fc*fc;
 
             for (int i = 0; i < a.Length; i++)
             {
@@ -72,17 +91,20 @@ namespace Filters
             double[] a = new double[order];
             double[] b = new double[order + 1];
 
-            double D = Q * fc * fc * Math.Pow(gamma, 4) + fc * bw * (gamma * gamma + 1) + Q * (2 * fc * fc + bw * bw) * gamma * gamma + Q * fc * fc;
+            double D = Q * fc * fc * Math.Pow(gamma, 4) 
+                - fc * bw * (gamma * gamma + 1) * gamma
+                + Q * (2 * fc * fc + bw * bw) * gamma * gamma 
+                + Q * fc * fc;
 
-            b[0] = Q*bw*bw*gamma*gamma;
-            b[1] = 0;
-            b[2] = -2*b[0];
-            b[3] = 0;
+            b[0] = Q*fc*fc*(Math.Pow(gamma, 4)+2*gamma*gamma+1);
+            b[1] = 4*Q*fc*fc*(Math.Pow(gamma, 4)-1);
+            b[2] = 2* Q * fc * fc * (3*Math.Pow(gamma, 4) - 2 * gamma * gamma + 3);
+            b[3] = b[1];
             b[4] = b[0];
-            a[0] = 2*fc*(2*Q*fc*Math.Pow(gamma, 4)+bw*(gamma*gamma-1)*gamma-2*Q*fc);
+            a[0] = 2*fc*(2*Q*fc*Math.Pow(gamma, 4)-bw*(gamma*gamma-1)*gamma-2*Q*fc);
             a[1] = 2 * Q * (3*fc*fc*Math.Pow(gamma, 4)-(2*fc*fc+bw*bw)*gamma*gamma+3*fc*fc);
-            a[2] = 2*fc*(2*Q*fc*Math.Pow(gamma,4)-bw*(gamma*gamma-1)*gamma-2*Q*fc);
-            a[3] = Q*fc*fc*Math.Pow(gamma, 4)-fc*bw*(gamma*gamma+1)+Q*(2*fc*fc+bw*bw)*gamma*gamma+Q*fc*fc;
+            a[2] = 2*fc*(2*Q*fc*Math.Pow(gamma,4)+bw*(gamma*gamma-1)*gamma-2*Q*fc);
+            a[3] = Q*fc*fc*Math.Pow(gamma, 4)+fc*bw*(gamma*gamma+1)*gamma+Q*(2*fc*fc+bw*bw)*gamma*gamma+Q*fc*fc;
 
             for (int i = 0; i < a.Length; i++)
             {

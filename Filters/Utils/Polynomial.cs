@@ -29,7 +29,7 @@ namespace Filters
         public Polynomial(params Complex[] a)
         {
             int toIndex = 0;
-            for (int i = a.Length-1; i > -1; i++)
+            for (int i = a.Length-1; i > -1; i--)
             {
                 if (a[i] != 0)
                 {
