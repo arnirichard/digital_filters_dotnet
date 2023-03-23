@@ -138,7 +138,7 @@ namespace Filters
                     D = new Polynomial(fc,
                         kappa*bw,
                         fc).Evaluate(gamma).Real;
-                    b[0] = kappa * bw;
+                    b[0] = kappa * bw*gamma;
                     b[1] = 0;
                     b[2] = -b[0];
                     a[0] = 2*fc*(gamma*gamma-1);
