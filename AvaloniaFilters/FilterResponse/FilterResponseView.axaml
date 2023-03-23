@@ -23,12 +23,12 @@
 				</WrapPanel>
 				<WrapPanel>
 					<TextBlock VerticalAlignment="Center" Margin="10">Filter</TextBlock>
-					<ComboBox x:Name="filterTypeCombo" SelectedIndex="0" Margin="10"/>
-					<ComboBox x:Name="filterPassTypeCombo" SelectedIndex="0" Margin="10"/>
+					<ComboBox x:Name="filterTypeCombo" SelectedIndex="0" Margin="10" MinWidth="100"/>
+					<ComboBox x:Name="filterPassTypeCombo" SelectedIndex="0" Margin="10" MinWidth="80"/>
 				</WrapPanel>
 				<WrapPanel>
 					<TextBlock VerticalAlignment="Center" Margin="10">Order</TextBlock>
-					<ComboBox x:Name="orderCombo" SelectedIndex="0"/>
+					<ComboBox x:Name="orderCombo" SelectedIndex="0" MinWidth="60" HorizontalContentAlignment="Center"/>
 				</WrapPanel>
 				<WrapPanel>
 					<TextBlock VerticalAlignment="Center" Margin="10">Cut off frequency:</TextBlock>

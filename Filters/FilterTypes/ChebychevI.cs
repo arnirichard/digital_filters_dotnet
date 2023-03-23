@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Filters
 {
-    internal class ChebychevI
+    public class ChebychevI
     {
         public static readonly double Alpha = Math.Cos(5 * Math.PI / 8);
         public static readonly double Beta = Math.Cos(7 * Math.PI / 8);
@@ -16,16 +16,16 @@ namespace Filters
         public static IIRFilter BandStop(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
 
             if (parameters.RippleFactor == null)
-                throw new Exception("Ripple factor not specified");
+                throw new ArgumentException("Ripple factor not specified");
 
             if (parameters.BW == null)
-                throw new Exception("Bandwidth not specified");
+                throw new ArgumentException("Bandwidth not specified");
 
             if (parameters.Order != 2 && parameters.Order != 4)
-                throw new Exception("Order must be 2 or 4");
+                throw new ArgumentException("Order must be 2 or 4");
 
             int order = parameters.Order ?? 2;
             int fc = parameters.Fc;
@@ -34,10 +34,10 @@ namespace Filters
             double bw = parameters.BW ?? 100;
 
             if (fs <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (fc < 0 || fc > fs / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(fc * Math.PI / fs);
             double D, v_0, lambda, kappa;
@@ -101,16 +101,16 @@ namespace Filters
         public static IIRFilter BandPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
 
             if (parameters.RippleFactor == null)
-                throw new Exception("Ripple factor not specified");
+                throw new ArgumentException("Ripple factor not specified");
 
             if (parameters.BW == null)
-                throw new Exception("Bandwidth not specified");
+                throw new ArgumentException("Bandwidth not specified");
 
             if (parameters.Order !=  2 && parameters.Order != 4)
-                throw new Exception("Order must be 2 or 4");
+                throw new ArgumentException("Order must be 2 or 4");
 
             int order = parameters.Order ?? 2;
             int fc = parameters.Fc;
@@ -119,10 +119,10 @@ namespace Filters
             double bw = parameters.BW ?? 100;
 
             if (fs <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (fc < 0 || fc > fs / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(fc * Math.PI / fs);
             double D, v_0, lambda, kappa;
@@ -222,13 +222,13 @@ namespace Filters
         public static IIRFilter HighPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
 
             if (parameters.RippleFactor == null)
-                throw new Exception("Ripple factor not specified");
+                throw new ArgumentException("Ripple factor not specified");
 
             if (parameters.Order < 1 || parameters.Order > 4)
-                throw new Exception("Order must be beetween 1 and 4");
+                throw new ArgumentException("Order must be beetween 1 and 4");
 
             int order = parameters.Order ?? 2;
             int fc = parameters.Fc;
@@ -236,10 +236,10 @@ namespace Filters
             double R = parameters.RippleFactor ?? 1;
 
             if (fs <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (fc < 0 || fc > fs / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(fc * Math.PI / fs);
             double D, v_0, lambda, kappa;
@@ -375,13 +375,13 @@ namespace Filters
         public static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
 
             if (parameters.RippleFactor == null)
-                throw new Exception("Ripple factor not specified");
+                throw new ArgumentException("Ripple factor not specified");
 
             if (parameters.Order < 1 || parameters.Order > 4)
-                throw new Exception("Order must be beetween 1 and 4");
+                throw new ArgumentException("Order must be beetween 1 and 4");
 
             int order = parameters.Order ?? 2;
             int fc = parameters.Fc;
@@ -389,10 +389,10 @@ namespace Filters
             double R = parameters.RippleFactor ?? 1;
 
             if (fs <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (fc < 0 || fc > fs / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(fc * Math.PI / fs);
             double D, v_0, lambda, kappa;

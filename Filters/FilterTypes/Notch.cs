@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Filters
 {
-    internal class Notch
+    public class Notch
     {
     }
 }

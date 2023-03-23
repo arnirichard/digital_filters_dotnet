@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Filters
 {
-    internal class VariableQ
+    public class VariableQ
     {
         [IIRFilterAttr(FilterType.VariableQ, FilterPassType.BandPass, 4)]
         public static IIRFilter BandPass(FilterParameters parameters)
         {
             if (parameters.BW == null)
-                throw new Exception("Bandwidth not specified");
+                throw new ArgumentException("Bandwidth not specified");
             if (parameters.Q == null)
-                throw new Exception("Q not specified");
+                throw new ArgumentException("Q not specified");
 
             int order = 4;
             double Q = parameters.Q ?? 1;
@@ -77,9 +77,9 @@ namespace Filters
         public static IIRFilter BandStop(FilterParameters parameters)
         {
             if (parameters.BW == null)
-                throw new Exception("Bandwidth not specified");
+                throw new ArgumentException("Bandwidth not specified");
             if (parameters.Q == null)
-                throw new Exception("Q not specified");
+                throw new ArgumentException("Q not specified");
 
             int order = 4;
             double Q = parameters.Q ?? 1;
@@ -123,7 +123,7 @@ namespace Filters
         public static IIRFilter HighPass(FilterParameters parameters)
         {
             if (parameters.Q == null)
-                throw new Exception("Q not specified");
+                throw new ArgumentException("Q not specified");
 
             int order = 2;
             int fc = parameters.Fc;
@@ -159,7 +159,7 @@ namespace Filters
         public static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Q == null)
-                throw new Exception("Q not specified");
+                throw new ArgumentException("Q not specified");
 
             int order = 2;
             int fc = parameters.Fc;

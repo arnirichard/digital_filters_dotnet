@@ -13,11 +13,11 @@ namespace Filters
         public static IIRFilter BandPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
             if (parameters.Order != 4)
-                throw new Exception("Order must be 4");
+                throw new ArgumentException("Order must be 4");
             if (parameters.BW == null)
-                throw new Exception("BW not specified");
+                throw new ArgumentException("BW not specified");
 
             int order = 4;
             int fc = parameters.Fc;
@@ -25,10 +25,10 @@ namespace Filters
             double bw = parameters.BW ?? 100;
 
             if (fs <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (fc < 0 || fc > fs / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(fc * Math.PI / fs);
             double D;
@@ -86,11 +86,11 @@ namespace Filters
         public static IIRFilter BandStop(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
             if (parameters.Order != 4)
-                throw new Exception("Order must be 4");
+                throw new ArgumentException("Order must be 4");
             if (parameters.BW == null)
-                throw new Exception("BW not specified");
+                throw new ArgumentException("BW not specified");
 
             int order = 4;
             int fc = parameters.Fc;
@@ -98,10 +98,10 @@ namespace Filters
             double bw = parameters.BW ?? 100;
 
             if (f_s <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (fc < 0 || fc > f_s / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(fc * Math.PI / f_s);
             double[] a = new double[order];
@@ -155,20 +155,20 @@ namespace Filters
         public static IIRFilter HighPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
 
             if (parameters.Order < 2 || parameters.Order > 4)
-                throw new Exception("Order must be beetween 2 and 4");
+                throw new ArgumentException("Order must be beetween 2 and 4");
 
             int order = parameters.Order ?? 2;
             int f_c = parameters.Fc;
             int f_s = parameters.Fs;
 
             if (f_s <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (f_c < 0 || f_c > f_s / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(f_c * Math.PI / f_s);
             double D;
@@ -228,20 +228,20 @@ namespace Filters
         public static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
-                throw new Exception("Order not specified");
+                throw new ArgumentException("Order not specified");
 
             if (parameters.Order < 1 || parameters.Order > 4)
-                throw new Exception("Order must be beetween 1 and 4");
+                throw new ArgumentException("Order must be beetween 1 and 4");
 
             int order = parameters.Order ?? 2;
             int f_c = parameters.Fc;
             int f_s = parameters.Fs;
 
             if (f_s <= 0)
-                throw new Exception("Sampling frequency must be positive.");
+                throw new ArgumentException("Sampling frequency must be positive.");
 
             if (f_c < 0 || f_c > f_s / 2)
-                throw new Exception("Cut-off must be positive and less than half F_s.");
+                throw new ArgumentException("Cut-off must be positive and less than half F_s.");
 
             double gamma = Math.Tan(f_c * Math.PI / f_s);
             double D;

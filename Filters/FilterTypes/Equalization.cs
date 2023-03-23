@@ -13,10 +13,10 @@ namespace Filters
         public static IIRFilter Create(FilterParameters parameters)
         {
             if (parameters.BW == null)
-                throw new Exception("Bandwidth not specified");
+                throw new ArgumentException("Bandwidth not specified");
 
             if (parameters.LinearGain == null)
-                throw new Exception("LinearGain not specified");
+                throw new ArgumentException("LinearGain not specified");
             
             double bw = parameters.BW ?? 100;
             int fc = parameters.Fc;

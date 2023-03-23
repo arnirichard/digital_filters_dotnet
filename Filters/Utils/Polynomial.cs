@@ -108,7 +108,7 @@ namespace Filters
                 return eigen.EigenValues.AsArray();
             }
 
-            throw new Exception("Roots not found");
+            throw new ArgumentException("Roots not found");
         }
 
         /// <summary>
