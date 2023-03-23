@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Filters;
+using MathNet.Numerics;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,18 @@ namespace AvaloniaFilters
             Bottom = bottom;
             Left = left;
             Item = item;
+        }
+
+        public override string ToString()
+        {
+            if (Item is Complex c)
+            {
+                return string.Format("{0}+i{1}",
+                    c.Real.ToString("0.###"),
+                    c.Imaginary.ToString("0.###"));
+            }
+
+            return Item?.ToString() ?? "null";
         }
     }
 
@@ -44,7 +57,7 @@ namespace AvaloniaFilters
                 double[] omega = 0.1D.GetLinearRange(Math.PI, 300);
                 double[] freqs = omega.Select(o => o * filter.Parameters.Fs / 2 / Math.PI).ToArray();
                 Complex[] response = filter.GetResponse(omega);
-                Magnitude = new PlotViewModel(response.Select(r => Math.Log10(r.Magnitude)).ToArray(), freqs);
+                Magnitude = new PlotViewModel(response.Select(r => 20*Math.Log10(r.MagnitudeSquared())).ToArray(), freqs);
                 double peak = response[0].Magnitude;
                 double peakFreq = -1;
                 for (int i = 0; i < response.Length; i++)

@@ -12,6 +12,91 @@ namespace Filters
         public static readonly double Alpha = Math.Cos(5 * Math.PI / 8);
         public static readonly double Beta = Math.Cos(7 * Math.PI / 8);
 
+        [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.BandStop, 2, 4)]
+        public static IIRFilter BandStop(FilterParameters parameters)
+        {
+            if (parameters.Order == null)
+                throw new Exception("Order not specified");
+
+            if (parameters.RippleFactor == null)
+                throw new Exception("Ripple factor not specified");
+
+            if (parameters.BW == null)
+                throw new Exception("Bandwidth not specified");
+
+            if (parameters.Order != 2 && parameters.Order != 4)
+                throw new Exception("Order must be 2 or 4");
+
+            int order = parameters.Order ?? 2;
+            int fc = parameters.Fc;
+            int fs = parameters.Fs;
+            double R = parameters.RippleFactor ?? 1;
+            double bw = parameters.BW ?? 100;
+
+            if (fs <= 0)
+                throw new Exception("Sampling frequency must be positive.");
+
+            if (fc < 0 || fc > fs / 2)
+                throw new Exception("Cut-off must be positive and less than half F_s.");
+
+            double gamma = Math.Tan(fc * Math.PI / fs);
+            double D, v_0, lambda, kappa;
+            double[] a = new double[order];
+            double[] b = new double[order + 1];
+
+            switch (order)
+            {
+                case 2:
+                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5));
+                    kappa = Math.Sinh(v_0);
+                    lambda = Math.Cosh(v_0);
+                    D = new Polynomial(fc*kappa,
+                        bw,
+                        kappa*fc).Evaluate(gamma).Real;
+                    b[0] = fc * kappa * (gamma*gamma+1);
+                    b[1] = 2*fc*kappa*(gamma*gamma-1);
+                    b[2] = b[0];
+                    a[0] = 2 * kappa * fc * (gamma*gamma-1);
+                    a[1] = kappa*fc*gamma*gamma-bw*gamma+kappa*fc;
+                    break;
+                case 4:
+                default:
+                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5)) / 2;
+                    kappa = Math.Sinh(v_0);
+                    lambda = Math.Cosh(v_0);
+                    D = fc * fc * (kappa * kappa + lambda * lambda)
+                        + 2 * Math.Sqrt(2) * bw * fc * kappa * gamma * (gamma * gamma + 1)
+                        + 2 * (bw * bw + fc * fc * (kappa * kappa + lambda * lambda)) * gamma * gamma;
+
+                    b[0] = fc * fc * (kappa * kappa + lambda * lambda) * (Math.Pow(gamma, 4) + 2 * gamma * gamma + 1);
+                    b[1] = 4*fc*fc*(kappa*kappa+lambda*lambda)*(Math.Pow(gamma, 4)-1);
+                    b[2] = 2*fc*fc*(lambda*lambda+kappa*kappa)*(3*Math.Pow(gamma, 4)-2*gamma*gamma+3);
+                    b[3] = b[1];
+                    b[4] = b[0];
+                    a[0] = 4*fc*fc*(lambda*lambda+kappa*kappa)*(Math.Pow(gamma, 4)-1)+4*Math.Sqrt(2)*bw*fc*kappa*gamma*(gamma*gamma-1);
+                    a[1] = 6 * fc * fc * (lambda * lambda + kappa * kappa) * (Math.Pow(gamma, 4) + 1) 
+                        - 4 * (fc * fc * (kappa * kappa + lambda * lambda) + bw * bw) * lambda * lambda;
+                    a[2] = 4 * fc * fc * (kappa*kappa+lambda*lambda)*(Math.Pow(gamma, 4)-1)
+                        - 4 * Math.Sqrt(2)*bw*fc*kappa*lambda*(lambda*lambda-1);
+                    a[3] = fc*fc*(kappa*kappa+lambda*lambda)*(Math.Pow(gamma, 4)+1)
+                        - 2 * Math.Sqrt(2)*bw*fc*kappa*gamma*(gamma*gamma+1)
+                        + 2 * (2*bw+fc*fc*(kappa*kappa+lambda*lambda))*gamma*gamma;
+                    break;
+            }
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] /= D;
+            }
+
+            for (int i = 0; i < b.Length; i++)
+            {
+                b[i] /= D;
+            }
+
+            return new IIRFilter(a, b, parameters);
+        }
+
         [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.BandPass, 2, 4)]
         public static IIRFilter BandPass(FilterParameters parameters)
         {
@@ -131,12 +216,6 @@ namespace Filters
             }
 
             return new IIRFilter(a, b, parameters);
-        }
-
-        [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.BandStop,2, 4)]
-        public static IIRFilter BandStop(FilterParameters parameters)
-        {
-            throw new NotImplementedException();
         }
 
         [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.HighPass, 1, 2, 3, 4)]

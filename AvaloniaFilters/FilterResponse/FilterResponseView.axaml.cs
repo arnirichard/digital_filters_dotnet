@@ -23,11 +23,26 @@ namespace AvaloniaFilters
             orderCombo.SelectionChanged += OrderCombo_SelectionChanged;
             cutoffFreqSlider.PropertyChanged += Slider_PropertyChanged;
             bandwidthSlider.PropertyChanged += Slider_PropertyChanged;
+            linearGainSlider.PropertyChanged += Slider_PropertyChanged;
 
             magnitudePlot.HorizontalLines = new LinesDefinition[]
             {
-                new LinesDefinition(0, 1, true, Plot.Beige)
+                new LinesDefinition(0, 1, true, Plot.Beige),
+                new LinesDefinition(0, 10, true, Plot.Beige),
+                new LinesDefinition(0, 20, true, Plot.Beige),
+                new LinesDefinition(0, 50, true, Plot.Beige),
             };
+            phasePlot.HorizontalLines = new LinesDefinition[]
+            {
+                new LinesDefinition(0, 10, true, Plot.Beige),
+                new LinesDefinition(0, 25, true, Plot.Beige),
+                new LinesDefinition(0, 50, true, Plot.Beige),
+            };
+
+            magnitudePlot.MaxYDisplayRangeStart = -100;
+            magnitudePlot.MinYDisplayRangeEnd = 1;
+            phasePlot.XUnit = magnitudePlot.XUnit = "Hz";
+            magnitudePlot.YUnit = "dB";
 
             phasePlot.VerticalLines = magnitudePlot.VerticalLines = new LinesDefinition[]
             {
@@ -39,12 +54,14 @@ namespace AvaloniaFilters
                 new LinesDefinition(2000, 0, true, Plot.Beige),
                 new LinesDefinition(4000, 0, true, Plot.Beige)
             };
+
+
+            magnitudePlot.MinYDisplayRangeEnd = 1;
         }
 
         private void FilterPassTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            bwPanel.IsVisible = filterPassTypeCombo.SelectedItem is FilterPassType pt &&
-                (pt == FilterPassType.BandPass || pt == FilterPassType.BandStop);
+            UpdatePanelVisibility();
             UpdateOrderCombo();
             CreateFilter();
         }
@@ -65,6 +82,16 @@ namespace AvaloniaFilters
         private void FilterTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             UpdatePassTypeCombo();
+        }
+
+        void UpdatePanelVisibility()
+        {
+            bwPanel.IsVisible = filterPassTypeCombo.SelectedItem is FilterPassType pt &&
+                (pt == FilterPassType.BandPass || pt == FilterPassType.BandStop);
+            linearGainPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft &&
+                ft == FilterType.Equalization;
+            rippleFactorPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft2 &&
+                (ft2 == FilterType.ChebychevTypeI | ft2 == FilterType.ChebychevTypeII);
         }
 
         void UpdatePassTypeCombo()
@@ -107,7 +134,9 @@ namespace AvaloniaFilters
                         Fs = vm.Fs,                        
                         Fc = (int)cutoffFreqSlider.Value,
                         BW = bandwidthSlider.Value,
-                        Order = order
+                        Order = order,
+                        LinearGain = linearGainSlider.Value,
+                        RippleFactor = rippleFactorSlider.Value
                     },
                     pt
                 );

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AvaloniaFilters.Utils
 {
-    public class NumberRange<K> where K : INumber<K>
+    public struct NumberRange<K> where K : INumber<K>
     {
         public K Start { get; }
         public K End { get; }

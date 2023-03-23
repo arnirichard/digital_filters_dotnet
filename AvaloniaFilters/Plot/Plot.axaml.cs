@@ -29,10 +29,10 @@ namespace AvaloniaFilters
         public static uint Blue = uint.Parse("FF0000FF", System.Globalization.NumberStyles.HexNumber);
         public ScaleType YScaleType { get; set; } = ScaleType.Linear;
         public ScaleType XScaleType { get; set; } = ScaleType.Linear;
-        public NumberRange<double>? YDisplayRange { get; set; }
-        public NumberRange<double>? XDisplayRange { get; set; }
+        public double? MinYDisplayRangeEnd, MaxYDisplayRangeStart;
         public LinesDefinition[]? HorizontalLines { get; set; }
         public LinesDefinition[]? VerticalLines { get; set; }
+        public string? XUnit, YUnit;
 
         int currentWidth, currentHeight;
 
@@ -86,7 +86,7 @@ namespace AvaloniaFilters
             {
                 TextBlock textBlock = new TextBlock()
                 {
-                    Text = plotLine.Value.ToString("0.###"),
+                    Text = plotLine.Value.ToString("0.###") + ((below ? XUnit : YUnit) ?? ""),
                     TextAlignment = TextAlignment.Center,
                     Foreground = new SolidColorBrush(Colors.Black)
                 };
@@ -129,8 +129,13 @@ namespace AvaloniaFilters
 
                     NumberRange<double> xRange = vm.XRange ?? new NumberRange<double>(1, vm.Y.Length);
                     double[] x = vm.X ?? 1D.GetLinearRange(vm.Y.Length, vm.Y.Length);
+                    NumberRange<double> yDisplayRange = MinYDisplayRangeEnd is double d
+                        ? new NumberRange<double>(
+                                Math.Max(MaxYDisplayRangeStart ?? vm.YRange.Start, vm.YRange.Start),
+                                d > vm.YRange.End ? d: vm.YRange.End)
+                        : vm.YRange;
 
-                    AxisData yAxisData = new AxisData(vm.Y, vm.YRange, vm.YRange, (int)YScaleType);
+                    AxisData yAxisData = new AxisData(vm.Y, vm.YRange, yDisplayRange, (int)YScaleType);
                     AxisData xAxisData = new AxisData(x, xRange, xRange, (int)XScaleType);
 
                     List<PlotLine> horizontalPlotLines = new();

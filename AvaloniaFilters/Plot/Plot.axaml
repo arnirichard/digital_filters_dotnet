@@ -14,13 +14,13 @@
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 
-		<Border Grid.Column="1" BorderBrush="Black" BorderThickness="0.5">
+		<Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
 			<Grid Name="grid">
 				<Image Name="image"/>
 			</Grid>
 		</Border>
 
-		<Canvas Name="sideLabels" Grid.Row="0" Grid.Column="0" Width="20"/>
+		<Canvas Name="sideLabels" Grid.Row="0" Grid.Column="0" Width="40"/>
 
 		<Canvas Name="belowLabels" Grid.Column="1" Grid.Row="1" Height="20"/>
 	</Grid>

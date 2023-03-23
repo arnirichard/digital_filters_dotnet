@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="AvaloniaFilters.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-		Width="1200" Height="1000"
+		Width="1400" Height="1000"
 		WindowStartupLocation="CenterScreen"
         Title="AvaloniaFilters">
 
