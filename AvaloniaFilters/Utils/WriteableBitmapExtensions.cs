@@ -4,7 +4,6 @@ using Avalonia.Media.Imaging;
 using AvaloniaFilters.Utils;
 using DynamicData;
 using Filters;
-using JetBrains.Annotations;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
