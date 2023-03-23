@@ -25,7 +25,7 @@ namespace Filters
             double bw = parameters.BW ?? 100;
 
             double D = Q * fc * fc * Math.Pow(gamma, 4) 
-                + bw + fc * (gamma * gamma + 1) * gamma 
+                + bw * fc * (gamma * gamma + 1) * gamma 
                 + Q * (2 * fc * fc + bw * bw) * gamma * gamma 
                 + Q * fc * fc;
 
