@@ -24,6 +24,7 @@ namespace AvaloniaFilters
             cutoffFreqSlider.PropertyChanged += Slider_PropertyChanged;
             bandwidthSlider.PropertyChanged += Slider_PropertyChanged;
             linearGainSlider.PropertyChanged += Slider_PropertyChanged;
+            qSlider.PropertyChanged += Slider_PropertyChanged;
 
             magnitudePlot.HorizontalLines = new LinesDefinition[]
             {
@@ -55,8 +56,7 @@ namespace AvaloniaFilters
                 new LinesDefinition(4000, 0, true, Plot.Beige)
             };
 
-
-            magnitudePlot.MinYDisplayRangeEnd = 1;
+            UpdatePanelVisibility();
         }
 
         private void FilterPassTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -92,6 +92,8 @@ namespace AvaloniaFilters
                 ft == FilterType.Equalization;
             rippleFactorPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft2 &&
                 (ft2 == FilterType.ChebychevTypeI | ft2 == FilterType.ChebychevTypeII);
+            qPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft3 &&
+                ft3 == FilterType.VariableQ;
         }
 
         void UpdatePassTypeCombo()
@@ -136,7 +138,8 @@ namespace AvaloniaFilters
                         BW = bandwidthSlider.Value,
                         Order = order,
                         LinearGain = linearGainSlider.Value,
-                        RippleFactor = rippleFactorSlider.Value
+                        RippleFactor = rippleFactorSlider.Value,
+                        Q = qSlider.Value
                     },
                     pt
                 );
