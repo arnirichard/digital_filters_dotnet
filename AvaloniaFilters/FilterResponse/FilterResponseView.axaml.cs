@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using DynamicData.Binding;
 using Filters;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AvaloniaFilters
@@ -25,6 +26,7 @@ namespace AvaloniaFilters
             bandwidthSlider.PropertyChanged += Slider_PropertyChanged;
             gainSlider.PropertyChanged += Slider_PropertyChanged;
             qSlider.PropertyChanged += Slider_PropertyChanged;
+            rippleFactorSlider.PropertyChanged += Slider_PropertyChanged;
 
             magnitudePlot.HorizontalLines = new LinesDefinition[]
             {
@@ -101,10 +103,15 @@ namespace AvaloniaFilters
         {
             if (filterTypeCombo.SelectedItem is FilterType ft)
             {
-                filterPassTypeCombo.Items = IIRFilter.GetFilterPassTypes(ft);
+                var selectedPastType = filterPassTypeCombo.SelectedItem;
+                List<FilterPassType> list = IIRFilter.GetFilterPassTypes(ft).ToList();
+                filterPassTypeCombo.Items = list;
+                filterPassTypeCombo.SelectedItem = selectedPastType;
 
                 if (filterPassTypeCombo.SelectedIndex < 0)
+                {
                     filterPassTypeCombo.SelectedIndex = 0;
+                }
 
                 UpdateOrderCombo();
 
@@ -117,7 +124,9 @@ namespace AvaloniaFilters
             if (filterTypeCombo.SelectedItem is FilterType ft &&
                 filterPassTypeCombo.SelectedItem is FilterPassType pt)
             {
+                int? order = orderCombo.SelectedItem as int?;
                 orderCombo.Items = IIRFilter.GetFilterOrders(ft, pt);
+                orderCombo.SelectedItem = order;
                 if (orderCombo.SelectedIndex < 0)
                     orderCombo.SelectedIndex = 0;
             }

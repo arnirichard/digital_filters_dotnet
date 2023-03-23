@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.Distributions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -137,7 +138,7 @@ namespace Filters
                     D = new Polynomial(fc,
                         kappa * bw,
                         fc).Evaluate(gamma).Real;
-                    b[0] = kappa * bw;
+                    b[0] = kappa * bw * gamma;
                     b[1] = 0;
                     b[2] = -b[0];
                     a[0] = 2 * fc * (gamma * gamma - 1);
@@ -401,99 +402,107 @@ namespace Filters
             switch (order)
             {
                 case 1:
-                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5));
+                    v_0 = Math.Asinh(Math.Sqrt(Math.Pow(10, R / 10) - 1));
                     kappa = Math.Sinh(v_0);
-                    D = kappa * gamma + 1;
-                    b[0] = kappa * gamma;
+                    D = kappa + gamma;
+                    b[0] = gamma;
                     b[1] = b[0];
-                    a[0] = kappa * gamma - 1;
+                    a[0] = gamma - kappa;
                     break;
                 case 2:
-                    v_0 = 0.5 * Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5));
+                    v_0 = 0.5 * Math.Asinh(Math.Sqrt(Math.Pow(10, R / 10) - 1));
                     kappa = Math.Sinh(v_0);
                     lambda = Math.Cosh(v_0);
-                    D = new Polynomial(2, 2 * Math.Sqrt(2) * kappa, kappa * kappa + lambda * lambda).Evaluate(gamma).Real;
-                    //(kappa*kappa+lambda*lambda) * gamma * gamma 
-                    //+ 2 * Math.Sqrt(2) * kappa * gamma + 2;
-                    b[0] = (kappa * kappa + lambda * lambda) * gamma * gamma;
-                    b[1] = 2 * b[0];
+                    D = new Polynomial(kappa * kappa + lambda * lambda,  2 * Math.Sqrt(2) * kappa, 2).Evaluate(gamma).Real;
+                    b[0] = 2*gamma*gamma+1;
+                    b[1] = 2*(2 * gamma * gamma - 1);
                     b[2] = b[0];
-                    a[0] = 2 * (kappa * kappa + lambda * lambda) * gamma * gamma - 4;
-                    a[1] = (kappa * kappa + lambda * lambda) * gamma * gamma
-                        - 2 * Math.Sqrt(2) * kappa * gamma - 2;
+                    a[0] = 4*gamma * gamma - 2 * (kappa * kappa + lambda * lambda);
+                    a[1] = 2*gamma*gamma-2*Math.Sqrt(2)*kappa*gamma+kappa*kappa+lambda*lambda;
                     break;
                 case 3:
-                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5)) / 3;
+                    v_0 = Math.Asinh(Math.Sqrt(Math.Pow(10, R / 10) - 1)) / 3;
                     kappa = Math.Sinh(v_0);
                     lambda = Math.Cosh(v_0);
-                    D = new Polynomial(4, 8 * kappa, 5 * kappa * kappa + 3 * lambda * lambda, kappa * (kappa * kappa + 3 * lambda * lambda)).Evaluate(gamma).Real;
-                    b[0] = kappa * (kappa * kappa + 3 * lambda * lambda) * Math.Pow(gamma, 3);
-                    b[1] = 3 * b[0];
-                    b[2] = 3 * b[0];
+                    D = new Polynomial(kappa * (kappa * kappa + 3 * lambda * lambda),
+                        5 * kappa * kappa + 3 * lambda * lambda,
+                        8 * kappa, 4).Evaluate(gamma).Real;
+                    b[0] = gamma*(4*gamma*gamma+3);
+                    b[1] = 3 * gamma *(4*gamma*gamma-1);
+                    b[2] = b[1];
                     b[3] = b[0];
-                    a[0] = new Polynomial(-12, -8 * kappa, 5 * kappa * kappa + 3 * lambda * lambda, 3 * kappa + (kappa * kappa + 3 * lambda * lambda)).Evaluate(gamma).Real;
-                    a[1] = new Polynomial(12, -8 * kappa, -(5 * kappa * kappa + 3 * lambda * lambda), 3 * kappa + (kappa * kappa + 3 * lambda * lambda)).Evaluate(gamma).Real; ;
-                    a[2] = new Polynomial(-4, 8 * kappa, -(5 * kappa * kappa + 3 * lambda * lambda), 3 * kappa + (kappa * kappa + 3 * lambda * lambda)).Evaluate(gamma).Real;
+                    a[0] = new Polynomial(
+                        -3 * kappa * (kappa * kappa + 3 * lambda * lambda),      
+                        -(5 * kappa * kappa + 3 * lambda * lambda),
+                        8 * kappa, 
+                        12).Evaluate(gamma).Real;
+                    a[1] = new Polynomial(
+                        3 * kappa * (kappa * kappa + 3 * lambda * lambda),
+                        -(5 * kappa *kappa + 3 * lambda * lambda) ,
+                        - 8 * kappa, 
+                        12).Evaluate(gamma).Real;
+                    a[2] = new Polynomial(
+                        -kappa*(kappa * kappa + 3 * lambda * lambda),
+                        5 * kappa * kappa + 3 * lambda * lambda , 
+                        - 8 * kappa, 
+                        4).Evaluate(gamma).Real;
                     break;
                 case 4:
                 default:
-                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5)) / 4;
+                    v_0 = Math.Asinh(Math.Sqrt(Math.Pow(10, R / 10) - 1)) / 4;
                     kappa = Math.Sinh(v_0);
                     lambda = Math.Cosh(v_0);
-                    D = new Polynomial(1,
-                        -2 * kappa * (Alpha + Beta),
-                        (1 + Math.Sqrt(2)) * kappa * kappa + lambda * lambda,
-                        -kappa *
-                        (
-                            Math.Sqrt(2) / 2 * kappa * kappa * (Alpha + Beta)
-                            + 2 * lambda * lambda * (Math.Pow(Alpha, 3) + Math.Pow(Beta, 3))
+                    D = new Polynomial(
+                        Math.Pow(kappa,4)+Math.Pow(lambda,4)+ 6*kappa*kappa*lambda*lambda,
+                        -4*kappa*(
+                            Math.Sqrt(2)*kappa*kappa*(Alpha+Beta)
+                            + 4 * lambda * lambda * (Math.Pow(Alpha, 3) +Math.Pow(Beta,3))
                         ),
-                        (Math.Pow(kappa, 4) + Math.Pow(lambda, 4)) / 8 + 3 / 4 * kappa * kappa * lambda * lambda
+                        8*((1+Math.Sqrt(2))*kappa*kappa+lambda*lambda),
+                        -16*kappa*(Alpha+Beta),
+                        8
                     ).Evaluate(gamma).Real;
-                    b[0] = (Math.Pow(kappa, 4) + Math.Pow(lambda, 4)) / 8 + 3 / 4 * kappa * kappa * lambda * lambda;
-                    b[1] = 4 * b[0];
-                    b[2] = 6 * b[0];
-                    b[3] = 4 * b[0];
+                    b[0] = 8 * Math.Pow(gamma, 4) + 8 * gamma * gamma + 1; ;
+                    b[1] = 4 * (8*Math.Pow(gamma, 4)-1);
+                    b[2] = 2 * (24*Math.Pow(gamma, 4)-8*gamma*gamma+3);
+                    b[3] = b[1];
                     b[4] = b[0];
                     a[0] = new Polynomial(
-                        -4,
-                        4 * kappa * (Alpha + Beta),
+                        -4*(Math.Pow(kappa, 4) + Math.Pow(lambda, 4) + 6*kappa*kappa*lambda*lambda),
+                        8*kappa*(
+                                Math.Sqrt(2)*kappa*kappa*(Alpha+Beta)
+                                +4*lambda*lambda*(Math.Pow(Alpha,3)+Math.Pow(Beta,3))
+                            ),
                         0,
-                        -kappa *
-                        (
-                            Math.Sqrt(2) * kappa * kappa * (Alpha + Beta)
-                            + 4 * lambda * lambda * (Math.Pow(Alpha, 3) + Math.Pow(Beta, 3))
-                        ),
-                        (Math.Pow(kappa, 4) + Math.Pow(lambda, 4)) / 2 + 3 * kappa * kappa * lambda * lambda
+                        -32*kappa*(Alpha+Beta),
+                        32
                     ).Evaluate(gamma).Real;
                     a[1] = new Polynomial(
-                        6,
+                        6 * (Math.Pow(kappa, 4) + Math.Pow(lambda, 4) + 6 * kappa * kappa * lambda * lambda),
                         0,
-                        -2 * ((1 + Math.Sqrt(2)) * kappa * kappa + lambda * lambda),
+                        -16*((1+Math.Sqrt(2))*kappa*kappa+lambda*lambda),
                         0,
-                        0.75 * (Math.Pow(kappa, 4) + Math.Pow(lambda, 4)) + 4.5 * kappa * kappa * lambda * lambda
+                        48
                     ).Evaluate(gamma).Real;
                     a[2] = new Polynomial(
-                        -4,
-                        4 * kappa * (Alpha + Beta),
+                        -4 * (Math.Pow(kappa, 4) + Math.Pow(lambda, 4) + 6 * kappa * kappa * lambda * lambda),
+                        -8 * kappa * (
+                                Math.Sqrt(2) * kappa * kappa * (Alpha + Beta)
+                                + 4 * lambda * lambda * (Math.Pow(Alpha, 3) + Math.Pow(Beta, 3))
+                            ),
                         0,
-                        kappa *
-                        (
-                            Math.Sqrt(2) * kappa * kappa * (Alpha + Beta)
-                            + 4 * lambda * lambda * (Math.Pow(Alpha, 3) + Math.Pow(Beta, 3))
-                        ),
-                        (Math.Pow(kappa, 4) + Math.Pow(lambda, 4)) / 2 + 3 * kappa * kappa * lambda * lambda
+                        32 * kappa * (Alpha + Beta),
+                        32
                     ).Evaluate(gamma).Real;
                     a[3] = new Polynomial(
-                        1,
-                        2 * kappa * (Alpha + Beta),
-                        (1 + Math.Sqrt(2)) * kappa * kappa + lambda * lambda,
-                        kappa *
-                        (
-                            Math.Sqrt(2) / 2 * kappa * kappa * (Alpha + Beta)
-                            + 2 * lambda * lambda * (Math.Pow(Alpha, 3) + Math.Pow(Beta, 3))
-                        ),
-                        (Math.Pow(kappa, 4) + Math.Pow(lambda, 4)) / 8 + kappa * kappa * lambda * lambda * 3 / 4
+                        Math.Pow(kappa, 4) + Math.Pow(lambda, 4) + 6 * kappa * kappa * lambda * lambda,
+                        4 * kappa * (
+                                Math.Sqrt(2) * kappa * kappa * (Alpha + Beta)
+                                + 4 * lambda * lambda * (Math.Pow(Alpha, 3) + Math.Pow(Beta, 3))
+                            ),
+                        8 * ((1 + Math.Sqrt(2)) * kappa * kappa + lambda * lambda),
+                        16*kappa*(Alpha+Beta),
+                        8
                     ).Evaluate(gamma).Real;
                     break;
             }
