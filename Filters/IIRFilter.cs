@@ -31,6 +31,7 @@ namespace Filters
             Nominator = new Polynomial(b.Reverse().ToArray());
             List<double> denomCoeffs = new List<double>() { 1 };
             denomCoeffs.AddRange(a);
+            denomCoeffs.Reverse();
             Denominator = new Polynomial(denomCoeffs.ToArray());
             Poles = Denominator.Roots();
             Zeros = Nominator.Roots();
