@@ -10,19 +10,33 @@ using System.Threading.Tasks;
 
 namespace AvaloniaFilters
 {
+    public class CanvasItem
+    {
+        public double Bottom { get; init; }
+        public double Left { get; init; }
+        public object Item { get; init; }
+
+        public CanvasItem(double left, double bottom, object item)
+        {
+            Bottom = bottom;
+            Left = left;
+            Item = item;
+        }
+    }
+
     internal class FilterResponseViewModel : ViewModelBase
     {
         public int Fs { get; set; } = 10000;
-        public Complex[]? Zeros { get; set; }
-        public Complex[]? Poles { get; set; }
+        public CanvasItem[]? Zeros { get; set; }
+        public CanvasItem[]? Poles { get; set; }
         public IIRFilter? Filter { get; set; }
         public PlotViewModel? Magnitude { get; set; }
         public PlotViewModel? Phase { get; set; }
 
         public void SetFilter(IIRFilter? filter)
-        {         
-            Zeros = filter?.Zeros;
-            Poles = filter?.Poles;
+        {
+            Zeros = filter?.Zeros.Select(z => new CanvasItem((z.Real + 1) * 150, (z.Imaginary + 1)*150, z)).ToArray();
+            Poles = filter?.Poles.Select(z => new CanvasItem((z.Real + 1) * 150, (z.Imaginary+ 1) * 150, z)).ToArray();
             Filter = filter;
 
             if (filter != null)
