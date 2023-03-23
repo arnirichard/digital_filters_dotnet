@@ -21,8 +21,8 @@ namespace AvaloniaFilters
             filterPassTypeCombo.SelectionChanged += FilterPassTypeCombo_SelectionChanged;
 
             orderCombo.SelectionChanged += OrderCombo_SelectionChanged;
-            cutoffFreqSlider.PropertyChanged += CutoffFreqSlider_PropertyChanged;
-            cutoffFreqTextBlock.Text = ((int)cutoffFreqSlider.Value).ToString();
+            cutoffFreqSlider.PropertyChanged += Slider_PropertyChanged;
+            bandwidthSlider.PropertyChanged += Slider_PropertyChanged;
 
             magnitudePlot.HorizontalLines = new LinesDefinition[]
             {
@@ -43,15 +43,16 @@ namespace AvaloniaFilters
 
         private void FilterPassTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            UpdateCombos();
+            bwPanel.IsVisible = filterPassTypeCombo.SelectedItem is FilterPassType pt &&
+                (pt == FilterPassType.BandPass || pt == FilterPassType.BandStop);
+            UpdateOrderCombo();
             CreateFilter();
         }
 
-        private void CutoffFreqSlider_PropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
+        private void Slider_PropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
         {
             if(e.Property == Slider.ValueProperty)
             {
-                cutoffFreqTextBlock.Text = ((int)cutoffFreqSlider.Value).ToString();
                 CreateFilter();
             }
         }
@@ -63,25 +64,33 @@ namespace AvaloniaFilters
 
         private void FilterTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            UpdateCombos();
+            UpdatePassTypeCombo();
         }
 
-        void UpdateCombos()
+        void UpdatePassTypeCombo()
         {
             if (filterTypeCombo.SelectedItem is FilterType ft)
             {
                 filterPassTypeCombo.Items = IIRFilter.GetFilterPassTypes(ft);
+
                 if (filterPassTypeCombo.SelectedIndex < 0)
                     filterPassTypeCombo.SelectedIndex = 0;
 
-                if (filterPassTypeCombo.SelectedItem is FilterPassType pt)
-                {
-                    orderCombo.Items = IIRFilter.GetFilterOrders(ft, pt);
-                    if (orderCombo.SelectedIndex < 0)
-                        orderCombo.SelectedIndex = 0;
-                }
+                UpdateOrderCombo();
+
+                CreateFilter();
             }
-            CreateFilter();
+        }
+
+        void UpdateOrderCombo()
+        {
+            if (filterTypeCombo.SelectedItem is FilterType ft &&
+                filterPassTypeCombo.SelectedItem is FilterPassType pt)
+            {
+                orderCombo.Items = IIRFilter.GetFilterOrders(ft, pt);
+                if (orderCombo.SelectedIndex < 0)
+                    orderCombo.SelectedIndex = 0;
+            }
         }
 
         void CreateFilter()

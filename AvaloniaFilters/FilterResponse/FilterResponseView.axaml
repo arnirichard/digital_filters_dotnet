@@ -31,7 +31,8 @@
 			</WrapPanel>
 			<WrapPanel>
 				<TextBlock VerticalAlignment="Center" Margin="10">Cut off frequency:</TextBlock>
-				<TextBlock x:Name="cutoffFreqTextBlock" VerticalAlignment="Center" Margin="10"/>
+				<TextBlock x:Name="cutoffFreqTextBlock" VerticalAlignment="Center" Margin="10"
+						   Text="{Binding Value,ElementName=cutoffFreqSlider}"/>
 			</WrapPanel>
 			<Slider x:Name="cutoffFreqSlider" Value="1000"
 				Minimum="20" Maximum="4999" TickFrequency="10"
@@ -39,9 +40,10 @@
 				HorizontalAlignment="Stretch"
 				Margin="10, 0"
 			/>
-			<WrapPanel>
+			<WrapPanel x:Name="bwPanel">
 				<TextBlock VerticalAlignment="Center" Margin="10">Bandwidth:</TextBlock>
-				<TextBlock x:Name="bandwidthTextBlock" VerticalAlignment="Center" Margin="10" Text="{Binding Value,ElementName=bandwidthSlider}"/>
+				<TextBlock x:Name="bandwidthTextBlock" VerticalAlignment="Center" Margin="10"
+						   Text="{Binding Value,ElementName=bandwidthSlider}"/>
 			</WrapPanel>
 			<Slider x:Name="bandwidthSlider" Value="100"
 				Minimum="1" Maximum="4999" TickFrequency="10"

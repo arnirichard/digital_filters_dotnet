@@ -13,25 +13,25 @@ namespace Filters
         public static readonly double Beta = Math.Cos(7 * Math.PI / 8);
 
         [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.BandPass)]
-        internal static IIRFilter BandPass(FilterParameters parameters)
+        public static IIRFilter BandPass(FilterParameters parameters)
         {
             throw new NotImplementedException();
         }
 
         [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.BandStop)]
-        internal static IIRFilter BandStop(FilterParameters parameters)
+        public static IIRFilter BandStop(FilterParameters parameters)
         {
             throw new NotImplementedException();
         }
 
         [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.HighPass)]
-        internal static IIRFilter HighPass(FilterParameters parameters)
+        public static IIRFilter HighPass(FilterParameters parameters)
         {
             throw new NotImplementedException();
         }
 
         [IIRFilterAttr(FilterType.ChebychevTypeI, FilterPassType.LowPass, 1, 2, 3, 4)]
-        internal static IIRFilter LowPass(FilterParameters parameters)
+        public static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");

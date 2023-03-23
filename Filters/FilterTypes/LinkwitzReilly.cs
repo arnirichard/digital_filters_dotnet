@@ -10,7 +10,7 @@ namespace Filters
     internal class LinkwitzReilly
     {
         [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.BandPass, 4)]
-        internal static IIRFilter BandPass(FilterParameters parameters)
+        public static IIRFilter BandPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");
@@ -67,7 +67,7 @@ namespace Filters
         }
 
         [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.BandStop, 4)]
-        internal static IIRFilter BandStop(FilterParameters parameters)
+        public static IIRFilter BandStop(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");
@@ -124,7 +124,7 @@ namespace Filters
         }
 
         [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.HighPass, 2, 4)]
-        internal static IIRFilter HighPass(FilterParameters parameters)
+        public static IIRFilter HighPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");
@@ -185,7 +185,7 @@ namespace Filters
         }
 
         [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.LowPass, 2, 4)]
-        internal static IIRFilter LowPass(FilterParameters parameters)
+        public static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");

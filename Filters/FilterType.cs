@@ -57,5 +57,12 @@ namespace Filters
         {
             return 100 * (int)FilterType + (int)FilterPassType;
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0}.{1}",
+                FilterType,
+                FilterPassType);
+        }
     }
 }
