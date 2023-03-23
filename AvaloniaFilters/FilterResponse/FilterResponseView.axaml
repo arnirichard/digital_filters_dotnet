@@ -69,7 +69,7 @@
 							</ItemsPanelTemplate>
 						</ItemsControl.ItemsPanel>
 						<ItemsControl.Styles>
-							<Style Selector="ItemsControl.items > ContentControl">
+							<Style Selector="ItemsControl > ContentPresenter">
 								<Setter Property="Canvas.Bottom" Value="{Binding Bottom}" />
 								<Setter Property="Canvas.Left" Value="{Binding Left}" />
 							</Style>
@@ -90,7 +90,7 @@
 							</ItemsPanelTemplate>
 						</ItemsControl.ItemsPanel>
 						<ItemsControl.Styles>
-							<Style Selector="ItemsControl.items > ContentControl">
+							<Style Selector="ItemsControl > ContentPresenter">
 								<Setter Property="Canvas.Bottom" Value="{Binding Bottom}" />
 								<Setter Property="Canvas.Left" Value="{Binding Left}" />
 							</Style>

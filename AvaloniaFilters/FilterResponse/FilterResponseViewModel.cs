@@ -35,8 +35,8 @@ namespace AvaloniaFilters
 
         public void SetFilter(IIRFilter? filter)
         {
-            Zeros = filter?.Zeros.Select(z => new CanvasItem((z.Real + 1) * 150, (z.Imaginary + 1)*150, z)).ToArray();
-            Poles = filter?.Poles.Select(z => new CanvasItem((z.Real + 1) * 150, (z.Imaginary+ 1) * 150, z)).ToArray();
+            Zeros = filter?.Zeros.Select(z => new CanvasItem(150 + z.Real * 125-5, 150+z.Imaginary * 125-5, z)).ToArray();
+            Poles = filter?.Poles.Select(z => new CanvasItem(150 + z.Real * 125-5, 150+ z.Imaginary * 125-5, z)).ToArray();
             Filter = filter;
 
             if (filter != null)

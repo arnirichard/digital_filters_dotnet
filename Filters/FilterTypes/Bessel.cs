@@ -9,14 +9,14 @@ namespace Filters
 {
     public class Bessel
     {
-        [IIRFilterAttr(FilterType.Bessel, FilterPassType.BandPass)]
+        [IIRFilterAttr(FilterType.Bessel, FilterPassType.BandPass, 4)]
         public static IIRFilter BandPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");
             if (parameters.Order != 4)
                 throw new Exception("Order must be 4");
-            if (parameters.BW != null)
+            if (parameters.BW == null)
                 throw new Exception("BW not specified");
 
             int order = 4;
@@ -69,14 +69,14 @@ namespace Filters
             return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.Bessel, FilterPassType.BandStop)]
+        [IIRFilterAttr(FilterType.Bessel, FilterPassType.BandStop, 4)]
         public static IIRFilter BandStop(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");
             if (parameters.Order != 4)
                 throw new Exception("Order must be 4");
-            if (parameters.BW != null)
+            if (parameters.BW == null)
                 throw new Exception("BW not specified");
 
             int order = 4;

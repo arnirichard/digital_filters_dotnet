@@ -16,7 +16,7 @@ namespace Filters
                 throw new Exception("Order not specified");
             if (parameters.Order != 4)
                 throw new Exception("Order must be 2 or 4");
-            if(parameters.BW != null)
+            if(parameters.BW == null)
                 throw new Exception("BW not specified");
 
             int order = 4;
@@ -73,7 +73,7 @@ namespace Filters
                 throw new Exception("Order not specified");
             if (parameters.Order != 4)
                 throw new Exception("Order must be 4");
-            if (parameters.BW != null)
+            if (parameters.BW == null)
                 throw new Exception("BW not specified");
 
             int order = 4;
