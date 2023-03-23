@@ -9,7 +9,7 @@ namespace Filters
 {
     public static class Equalization
     {
-        [IIRFilterAttr(FilterType.Equalization, FilterPassType.None)]
+        [IIRFilterAttr(FilterType.Equalization, FilterPassType.None, 2)]
         public static IIRFilter Create(FilterParameters parameters)
         {
             if (parameters.BW == null)
@@ -57,7 +57,7 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
     }
 }

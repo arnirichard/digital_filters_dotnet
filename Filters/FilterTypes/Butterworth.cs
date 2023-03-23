@@ -13,23 +13,21 @@ namespace Filters
         public static readonly double Alpha = -2 * (Math.Cos(5 * Math.PI / 8) + Math.Cos(7 * Math.PI / 8));
         public static readonly double Beta = 2 * (1 + 2 * Math.Cos(5 * Math.PI / 8) * Math.Cos(7 * Math.PI / 8));
 
-        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.BandStop)]
-        internal static IIRFilter BandStop(FilterParameters parameters) //int order, int f_c, int f_s, double bw)
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.BandStop, 2, 4)]
+        public static IIRFilter BandStop(FilterParameters parameters)
         {
             if (parameters.Order == null)
                 throw new Exception("Order not specified");
             if (parameters.BW == null)
                 throw new Exception("Bandwidth not specified");
 
+            if (parameters.Order < 2 || parameters.Order > 4)
+                throw new Exception("Order must be between 2 and 4");
+
             int order = parameters.Order ?? 2;
             double bw = parameters.BW ?? 100;
             int f_c = parameters.Fc;
             int f_s = parameters.Fs;
-
-            if (order <= 3)
-                order = 2;
-            else if (order != 4)
-                order = 4;
 
             double gamma = Math.Tan(f_c * Math.PI / f_s);
             double D;
@@ -77,10 +75,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.BandPass)]
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.BandPass, 2, 4)]
         public static IIRFilter BandPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -88,15 +86,13 @@ namespace Filters
             if (parameters.BW == null)
                 throw new Exception("Bandwidth not specified");
 
+            if (parameters.Order < 2 || parameters.Order > 4)
+                throw new Exception("Order must be between 2 and 4");
+
             int order = parameters.Order ?? 2;
             double bw = parameters.BW ?? 100;
             int f_c = parameters.Fc;
             int f_s = parameters.Fs;
-
-            if (order <= 3)
-                order = 2;
-            else if (order != 4)
-                order = 4;
 
             double gamma = Math.Tan(f_c * Math.PI / f_s);
             double D;
@@ -144,10 +140,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.HighPass)]
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.HighPass, 1, 2, 3, 4)]
         public static IIRFilter HighPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -156,7 +152,6 @@ namespace Filters
             int order = parameters.Order ?? 2;
             int f_c = parameters.Fc;
             int f_s = parameters.Fs;
-
 
             double gamma = Math.Tan(f_c * Math.PI / f_s);
             double D;
@@ -214,10 +209,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.LowPass)]
+        [IIRFilterAttr(FilterType.Butterworth, FilterPassType.LowPass, 1, 2, 3, 4)]
         public static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -292,7 +287,7 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
     }
 }

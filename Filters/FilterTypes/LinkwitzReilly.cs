@@ -9,7 +9,7 @@ namespace Filters
 {
     internal class LinkwitzReilly
     {
-        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.BandPass)]
+        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.BandPass, 4)]
         internal static IIRFilter BandPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -19,7 +19,7 @@ namespace Filters
             if(parameters.BW != null)
                 throw new Exception("BW not specified");
 
-            int order = parameters.Order ?? 2;
+            int order = 4;
             int f_c = parameters.Fc;
             int f_s = parameters.Fs;
             double bw = parameters.BW ?? 100;
@@ -63,10 +63,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.BandStop)]
+        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.BandStop, 4)]
         internal static IIRFilter BandStop(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -120,10 +120,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.HighPass)]
+        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.HighPass, 2, 4)]
         internal static IIRFilter HighPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -181,10 +181,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.LowPass)]
+        [IIRFilterAttr(FilterType.LinkwitzReilly, FilterPassType.LowPass, 2, 4)]
         internal static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -242,7 +242,7 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
     }
 }

@@ -14,19 +14,15 @@ namespace AvaloniaFilters
 
             DataContext = new FilterResponseViewModel();
 
-            filterTypeCombo.Items = Enum.GetValues(typeof(FilterType)).Cast<FilterType>();
-            filterPassTypeCombo.Items = Enum.GetValues(typeof(FilterPassType)).Cast<FilterPassType>();
-            filterTypeCombo.SelectedIndex = 0;
-            filterPassTypeCombo.SelectedIndex = 1;
-            orderCombo.Items = Enumerable.Range(1, 4);
-            orderCombo.SelectedIndex = 0;
-            CreateFilter();
-
             filterTypeCombo.SelectionChanged += FilterTypeCombo_SelectionChanged;
+            filterTypeCombo.Items = Enum.GetValues(typeof(FilterType)).Cast<FilterType>();
+            filterTypeCombo.SelectedIndex = 0;
+
+            filterPassTypeCombo.SelectionChanged += FilterPassTypeCombo_SelectionChanged;
+
             orderCombo.SelectionChanged += OrderCombo_SelectionChanged;
             cutoffFreqSlider.PropertyChanged += CutoffFreqSlider_PropertyChanged;
             cutoffFreqTextBlock.Text = ((int)cutoffFreqSlider.Value).ToString();
-            CreateFilter();
 
             magnitudePlot.HorizontalLines = new LinesDefinition[]
             {
@@ -45,6 +41,12 @@ namespace AvaloniaFilters
             };
         }
 
+        private void FilterPassTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            UpdateCombos();
+            CreateFilter();
+        }
+
         private void CutoffFreqSlider_PropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
         {
             if(e.Property == Slider.ValueProperty)
@@ -61,22 +63,44 @@ namespace AvaloniaFilters
 
         private void FilterTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
+            UpdateCombos();
+        }
+
+        void UpdateCombos()
+        {
+            if (filterTypeCombo.SelectedItem is FilterType ft)
+            {
+                filterPassTypeCombo.Items = IIRFilter.GetFilterPassTypes(ft);
+                if (filterPassTypeCombo.SelectedIndex < 0)
+                    filterPassTypeCombo.SelectedIndex = 0;
+
+                if (filterPassTypeCombo.SelectedItem is FilterPassType pt)
+                {
+                    orderCombo.Items = IIRFilter.GetFilterOrders(ft, pt);
+                    if (orderCombo.SelectedIndex < 0)
+                        orderCombo.SelectedIndex = 0;
+                }
+            }
             CreateFilter();
         }
 
         void CreateFilter()
         {
             if (DataContext is FilterResponseViewModel vm &&
-                filterTypeCombo.SelectedItem is FilterType)
+                filterTypeCombo.SelectedItem is FilterType ft &&
+                filterPassTypeCombo.SelectedItem is FilterPassType pt &&
+                orderCombo.SelectedItem is int order)
             {
                 IIRFilter? filter = IIRFilter.CreateFilter(
-                    (FilterType)filterTypeCombo.SelectedItem,
-                    new FilterParameters(order: orderCombo.SelectedIndex + 1,
-                        fs: vm.Fs,
-                        fc: (int)cutoffFreqSlider.Value),
-                    filterPassTypeCombo.SelectedItem is null 
-                        ? FilterPassType.None 
-                        : (FilterPassType)filterPassTypeCombo.SelectedItem
+                    ft,
+                    new FilterParameters(order: orderCombo.SelectedIndex + 1)
+                    {
+                        Fs = vm.Fs,                        
+                        Fc = (int)cutoffFreqSlider.Value,
+                        BW = bandwidthSlider.Value,
+                        Order = order
+                    },
+                    pt
                 );
                     
                 vm.SetFilter(filter);

@@ -8,82 +8,32 @@ using System.Text;
 
 namespace Filters
 {
-    public enum FilterType
-    {
-        Butterworth,
-        LinkwitzReilly,
-        Bessel,
-        ChebychevTypeI,
-        ChebychevTypeII,
-        VariableQ,
-        AllPass,
-        Equalization,
-        Notch,
-        Shelf
-    }
-
-    public enum FilterPassType
-    {
-        None,
-        LowPass,
-        HighPass,
-        BandPass,
-        BandStop
-    }
-
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    class IIRFilterAttr: Attribute
-    {
-        public FilterType FilterType;
-        public FilterPassType FilterPassType;
-
-        public IIRFilterAttr(FilterType filterType, FilterPassType filterPassType = FilterPassType.None)
-        {
-            FilterType = filterType;
-            FilterPassType = filterPassType;
-        }
-
-        public override bool Equals([NotNullWhen(true)] object? obj)
-        {
-            return obj is IIRFilterAttr fc &&
-                fc.FilterType == FilterType &&
-                fc.FilterPassType == FilterPassType;
-        }
-
-        public override int GetHashCode()
-        {
-            return 100*(int)FilterType + (int)FilterPassType;
-        }
-    }
-
     public class IIRFilter
     {
         // y_n = b_0 * x_n + b_1 * x_n-1 + ... + b_k * x_n-k + a_0 * y_n-1 + a_1 * y_n-2 + ... + a_m * y_n-m-1
         // H(z) = nominator/denominator
         // nominator = b_0 + b_1*z^-1 + ... + b_k*z^-k
         // denominator = 1 + a_0*z^-1 + ... + a_m * z^(-m-1)
-        public readonly double[] A, B;
+        public double[] A { get; init; }
+        public double[] B { get; init; }
+        public FilterParameters Parameters { get; init; }
+
         public readonly Complex[] Poles, Zeros;
-        public readonly Polynomial Nominator, Denominator;
-        // Sampling rate, cut-off freq
-        public readonly int Fs, Fc;
-        public readonly double? BandWidth;
+        public readonly Polynomial Nominator, Denominator;        
 
         static Dictionary<IIRFilterAttr, MethodInfo> filterCreators = new();
 
-        public IIRFilter(double[] a, double[] b, int fs, int fc, double? bandWidth = null)
+        public IIRFilter(double[] a, double[] b, FilterParameters filterParameters)
         {
             A = a;
             B = b;
-            Fs = fs;
-            Fc = fc;
+            Parameters = filterParameters;
             Nominator = new Polynomial(b.Reverse().ToArray());
             List<double> denomCoeffs = new List<double>() { 1 };
             denomCoeffs.AddRange(a);
             Denominator = new Polynomial(denomCoeffs.ToArray());
             Poles = Denominator.Roots();
             Zeros = Nominator.Roots();
-            BandWidth = bandWidth;
         }
 
         static IIRFilter()
@@ -123,8 +73,9 @@ namespace Filters
             return result;
         }
 
-        public IIRFilter(Complex[] poles, Complex[] zeros)
+        public IIRFilter(Complex[] zeros, Complex[] poles, FilterParameters parameters)
         {
+            Parameters = parameters;
             Poles = poles;
             Zeros = zeros;
             Nominator = Polynomial.FromRoots(zeros);
@@ -133,6 +84,53 @@ namespace Filters
             A = Denominator.Coefficients.ToList()
                 .GetRange(1, Denominator.Coefficients.Length)
                 .Select(c => c.Real).ToArray();
+        }
+
+        public static IIRFilter? CreateFilter(FilterType type,
+            FilterParameters filterParameters,
+            FilterPassType passType = FilterPassType.None)
+        {
+            MethodInfo? methodInfo;
+            IIRFilterAttr attr = new IIRFilterAttr(type, passType);
+            if (filterCreators.TryGetValue(attr, out methodInfo))
+            {
+                try
+                {
+                    return methodInfo.Invoke(null, new object[] { filterParameters }) as IIRFilter;
+                }
+                catch{}
+            }
+            return null;
+        }
+
+        public static List<FilterPassType> GetFilterPassTypes(FilterType filterType)
+        {
+            List<FilterPassType> result = new();
+
+            foreach (var kvp in filterCreators)
+            {
+                if (kvp.Key.FilterType == filterType)
+                {
+                    result.Add(kvp.Key.FilterPassType);
+                }
+            }
+
+            return result.Distinct().OrderBy(t => t.ToString()).ToList();
+        }
+
+        public static int[] GetFilterOrders(FilterType filterType, FilterPassType passType)
+        {
+            List<FilterPassType> result = new();
+
+            foreach (var kvp in filterCreators)
+            {
+                if (kvp.Key.FilterType == filterType && kvp.Key.FilterPassType == passType)
+                {
+                    return kvp.Key.Orders;
+                }
+            }
+
+            return new int[0];
         }
 
         public T[] Filter<T>(Span<T> input) where T : INumber<T>
@@ -161,23 +159,6 @@ namespace Filters
             }
 
             return result;
-        }
-
-        public static IIRFilter? CreateFilter(FilterType type,
-            FilterParameters filterParameters,
-            FilterPassType passType = FilterPassType.None)
-        {
-            MethodInfo? methodInfo;
-            IIRFilterAttr attr = new IIRFilterAttr(type, passType);
-            if (filterCreators.TryGetValue(attr, out methodInfo))
-            {
-                try
-                {
-                    return methodInfo.Invoke(null, new object[] { filterParameters }) as IIRFilter;
-                }
-                catch{}
-            }
-            return null;
         }
 
         public override string ToString()

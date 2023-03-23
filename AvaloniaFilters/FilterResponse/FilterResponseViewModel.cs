@@ -28,7 +28,7 @@ namespace AvaloniaFilters
             if (filter != null)
             {
                 double[] omega = 0.1D.GetLinearRange(Math.PI, 300);
-                double[] freqs = omega.Select(o => o * filter.Fs / 2 / Math.PI).ToArray();
+                double[] freqs = omega.Select(o => o * filter.Parameters.Fs / 2 / Math.PI).ToArray();
                 Complex[] response = filter.GetResponse(omega);
                 Magnitude = new PlotViewModel(response.Select(r => Math.Log10(r.Magnitude)).ToArray(), freqs);
                 double peak = response[0].Magnitude;

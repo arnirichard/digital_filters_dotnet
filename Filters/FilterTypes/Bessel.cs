@@ -66,7 +66,7 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
         [IIRFilterAttr(FilterType.Bessel, FilterPassType.BandStop)]
@@ -136,10 +136,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.Bessel, FilterPassType.HighPass)]
+        [IIRFilterAttr(FilterType.Bessel, FilterPassType.HighPass, 2, 3, 4)]
         public static IIRFilter HighPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -209,10 +209,10 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
 
-        [IIRFilterAttr(FilterType.Bessel, FilterPassType.LowPass)]
+        [IIRFilterAttr(FilterType.Bessel, FilterPassType.LowPass, 1, 2, 3, 4)]
         public static IIRFilter LowPass(FilterParameters parameters)
         {
             if (parameters.Order == null)
@@ -284,7 +284,7 @@ namespace Filters
                 b[i] /= D;
             }
 
-            return new IIRFilter(a, b, f_s, f_c);
+            return new IIRFilter(a, b, parameters);
         }
     }
 }

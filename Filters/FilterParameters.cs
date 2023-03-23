@@ -8,19 +8,18 @@ namespace Filters
 {
     public class FilterParameters
     {
+        public required int Fs { get; init; }
+        public required int Fc { get; init; }
         public int? Order;
-        public int Fs;
-        public int Fc;
         public double? BW;
         public double? Q;
         public double? LinearGain;
+        public double? RippleFactor;
 
-        public FilterParameters(int? order = null, int fs = 0, int fc = 0, double? bW = null,
+        public FilterParameters(int? order = null, double? bW = null,
             double? q = null, double? linearGain = null)
         {
             Order = order;
-            Fs = fs;
-            Fc = fc;
             BW = bW;
             Q = q;
             LinearGain = linearGain;

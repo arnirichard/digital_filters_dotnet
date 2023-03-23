@@ -20,11 +20,11 @@
 				<TextBlock VerticalAlignment="Center" Margin="10"
 						   Text="{Binding Fs}"/>
 			</WrapPanel>
-			<StackPanel Orientation="Vertical">
+			<WrapPanel>
 				<TextBlock VerticalAlignment="Center" Margin="10">Filter</TextBlock>
 				<ComboBox x:Name="filterTypeCombo" SelectedIndex="0"/>
 				<ComboBox x:Name="filterPassTypeCombo" SelectedIndex="0"/>
-			</StackPanel>
+			</WrapPanel>
 			<WrapPanel>
 				<TextBlock VerticalAlignment="Center" Margin="10">Order</TextBlock>
 				<ComboBox x:Name="orderCombo" SelectedIndex="0"/>
@@ -35,6 +35,16 @@
 			</WrapPanel>
 			<Slider x:Name="cutoffFreqSlider" Value="1000"
 				Minimum="20" Maximum="4999" TickFrequency="10"
+				SmallChange="10" 
+				HorizontalAlignment="Stretch"
+				Margin="10, 0"
+			/>
+			<WrapPanel>
+				<TextBlock VerticalAlignment="Center" Margin="10">Bandwidth:</TextBlock>
+				<TextBlock x:Name="bandwidthTextBlock" VerticalAlignment="Center" Margin="10" Text="{Binding Value,ElementName=bandwidthSlider}"/>
+			</WrapPanel>
+			<Slider x:Name="bandwidthSlider" Value="100"
+				Minimum="1" Maximum="4999" TickFrequency="10"
 				SmallChange="10" 
 				HorizontalAlignment="Stretch"
 				Margin="10, 0"
