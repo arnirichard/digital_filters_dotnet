@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -216,9 +217,9 @@ namespace AvaloniaFilters
             int index = 0;
             double xVal = xData.Values[index];
             double currentX, ratio;
-            int py;
+            int py, py2;
             bool isInsidePlot;
-            int lastPxInsidePlot = -1;
+            int lastPxInsidePlot = bm.PixelSize.Width, lastPyInsidePlot = -1;
             double lastYInsidePlot = 0;
             int pixelShift;
 
@@ -250,25 +251,29 @@ namespace AvaloniaFilters
                                 *(ptr + pixelShift - bm.PixelSize.Width) = color;
                         }
 
-                        if (px - lastPxInsidePlot > 1)
+                        if (px - lastPxInsidePlot > 1 || lastPyInsidePlot > -1 && Math.Abs(py - lastPyInsidePlot) > 1) // Is jump in px?
                         {
-                            var yrange = lastYInsidePlot.GetLogarithmicRange(yData.Values[index], px-lastPxInsidePlot+1, yData.LogBase);
-                            for (int px2 = 1; px2 < yrange.Length - 1; px2++)
+                            int length = Math.Max(px - lastPxInsidePlot + 1, lastPyInsidePlot > -1 ? Math.Abs(py - lastPyInsidePlot) + 1 : 1);
+                            var yrange = lastYInsidePlot.GetLogarithmicRange(yData.Values[index], length, yData.LogBase);
+                            var pxRange = ((double)lastPxInsidePlot).GetLinearRange(px, length);
+                            for (int px2 = 0; px2 < yrange.Length - 0; px2++)
                             {
                                 ratio = yrange[px2].GetLogarithmicRatio(yData.VisibleRange.Start, yData.VisibleRange.End, yData.LogBase);
-                                py = (int)((1 - ratio) * bm.PixelSize.Height);
-                                if (py < 0 || py >= bm.PixelSize.Height)
+                                py2 = (int)((1 - ratio) * bm.PixelSize.Height);
+                                if (py2 < 0 || py2 >= bm.PixelSize.Height)
                                 {
                                     break;
                                 }
-                                pixelShift = lastPxInsidePlot + px2 + py * bm.PixelSize.Width;
-                                * (ptr + pixelShift) = color;
-                                if (py > 0)
+
+                                pixelShift = (int)pxRange[px2] + py2 * bm.PixelSize.Width;
+                                *(ptr + pixelShift) = color;
+                                if (py2 > 0)
                                     *(ptr + pixelShift - bm.PixelSize.Width) = color;
                             }
                         }
 
                         lastPxInsidePlot = isInsidePlot ? px : bm.PixelSize.Width;
+                        lastPyInsidePlot = isInsidePlot ? py : -1;
 
                         if (isInsidePlot)
                             lastYInsidePlot = yData.Values[index];
