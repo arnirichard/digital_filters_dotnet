@@ -20,41 +20,54 @@ namespace Filters
                 throw new Exception("BW not specified");
 
             int order = 4;
-            int f_c = parameters.Fc;
-            int f_s = parameters.Fs;
+            int fc = parameters.Fc;
+            int fs = parameters.Fs;
             double bw = parameters.BW ?? 100;
 
-            if (f_s <= 0)
+            if (fs <= 0)
                 throw new Exception("Sampling frequency must be positive.");
 
-            if (f_c < 0 || f_c > f_s / 2)
+            if (fc < 0 || fc > fs / 2)
                 throw new Exception("Cut-off must be positive and less than half F_s.");
 
-            double gamma = Math.Tan(f_c * Math.PI / f_s);
+            double gamma = Math.Tan(fc * Math.PI / fs);
             double D;
             double[] a = new double[order];
             double[] b = new double[order + 1];
 
-            D = new Polynomial(f_c*f_c, 
-                3*bw*f_c,
-                2*f_c*f_c + 3 * bw*bw,
-                3 * bw * f_c,
-                f_c * f_c).Evaluate(gamma).Real;
+            D = new Polynomial(fc*fc, 
+                3*bw*fc,
+                2*fc*fc + 3 * bw*bw,
+                3 * bw * fc,
+                fc * fc).Evaluate(gamma).Real;
 
             b[0] = 3 * bw * bw * gamma * gamma;
             b[1] = 0;
             b[2] = -2*b[0];
             b[3] = 0;
             b[4] = b[0];
-            a[0] = 2 * f_c *
-                (2 * f_c * (Math.Pow(gamma, 4) - 1)
-                + 3 * bw * (gamma * gamma * gamma - gamma)
-                - 2 * f_c);
-            a[1] = 2 * (3*f_c*f_c*Math.Pow(gamma, 4) 
-                - (2*f_c*f_c+3*bw*bw) * gamma * gamma 
-                + 3 * f_c * f_c);
-            a[2] = 2*f_c * (2*f_c*Math.Pow(gamma, 4) - 3 * bw * (gamma*gamma*gamma-gamma) - 2 * f_c);
-            a[3] = new Polynomial(f_c*f_c, -3*bw*f_c, 2*f_c*f_c+3*bw*bw, -3*bw*f_c, f_c*f_c).Evaluate(gamma).Real;
+            a[0] = 2 * fc *
+                (2 * fc * Math.Pow(gamma, 4)
+                +3 * bw * (gamma * gamma * gamma - gamma)
+                - 2 * fc
+                );
+            a[1] = 2 * 
+                (
+                3*fc*fc*Math.Pow(gamma, 4) 
+                - (2*fc*fc+3*bw*bw) * gamma * gamma 
+                + 3 * fc * fc
+                );
+            a[2] = 2*fc * 
+                (
+                2*fc*Math.Pow(gamma, 4) 
+                - 3 * bw * (gamma*gamma*gamma-gamma) 
+                - 2 * fc
+                );
+            a[3] = new Polynomial(fc*fc, 
+                -3*bw*fc, 
+                2*fc*fc+3*bw*bw, 
+                -3*bw*fc, 
+                fc*fc).Evaluate(gamma).Real;
 
             for (int i = 0; i < a.Length; i++)
             {
@@ -80,51 +93,50 @@ namespace Filters
                 throw new Exception("BW not specified");
 
             int order = 4;
-            int f_c = parameters.Fc;
+            int fc = parameters.Fc;
             int f_s = parameters.Fs;
             double bw = parameters.BW ?? 100;
 
             if (f_s <= 0)
                 throw new Exception("Sampling frequency must be positive.");
 
-            if (f_c < 0 || f_c > f_s / 2)
+            if (fc < 0 || fc > f_s / 2)
                 throw new Exception("Cut-off must be positive and less than half F_s.");
 
-            double gamma = Math.Tan(f_c * Math.PI / f_s);
-            double D;
+            double gamma = Math.Tan(fc * Math.PI / f_s);
             double[] a = new double[order];
             double[] b = new double[order + 1];
 
-            D = new Polynomial(3* f_c * f_c,
-                3 * bw * f_c,
-                6 * f_c * f_c + bw * bw,
-                3 * bw * f_c,
-                3 * f_c * f_c).Evaluate(gamma).Real;
+            double D = new Polynomial(3* fc * fc,
+                3 * bw * fc,
+                6 * fc * fc + bw * bw,
+                3 * bw * fc,
+                3 * fc * fc).Evaluate(gamma).Real;
 
-            b[0] = f_c * f_c * (Math.Pow(gamma, 4) + 2 * gamma * gamma + 1);
-            b[1] = 12 * f_c * f_c * (Math.Pow(gamma, 4) - 1);
-            b[2] = 6 * f_c * f_c * (3 * Math.Pow(gamma, 4) - 2 * gamma * gamma + 3);
+            b[0] = 3* fc * fc * (Math.Pow(gamma, 4) + 2 * gamma * gamma + 1);
+            b[1] = 12 * fc * fc * (Math.Pow(gamma, 4) - 1);
+            b[2] = 6 * fc * fc * (3 * Math.Pow(gamma, 4) - 2 * gamma * gamma + 3);
             b[3] = b[1];
             b[4] = b[0];
-            a[0] = 6 * f_c * 
+            a[0] = 6 * fc * 
                 (
-                    2 * f_c * Math.Pow(gamma, 4)
+                    2 * fc * Math.Pow(gamma, 4)
                     + bw * (gamma * gamma * gamma - gamma)
-                    - 2 * f_c
+                    - 2 * fc
                 );
             a[1] = 2 * 
                 (
-                    9 * f_c * f_c * Math.Pow(gamma, 4)
-                    -(6*f_c*f_c+bw*bw)*gamma*gamma 
-                    +9*f_c*f_c
+                    9 * fc * fc * Math.Pow(gamma, 4)
+                    -(6*fc*fc+bw*bw)*gamma*gamma 
+                    +9*fc*fc
                 );
-            a[2] = 6 * f_c * 
+            a[2] = 6 * fc * 
                 (
-                    2*f_c* Math.Pow(gamma, 4)
+                    2*fc* Math.Pow(gamma, 4)
                     - bw * (Math.Pow(gamma, 3)-gamma)
-                    - 2 * f_c
+                    - 2 * fc
                 );
-            a[3] = new Polynomial(3*f_c*f_c, -3*bw*f_c, 6*f_c*f_c+bw*bw,3 * f_c * f_c).Evaluate(gamma).Real;
+            a[3] = new Polynomial(3*fc*fc, -3*bw*fc, 6*fc*fc+bw*bw,-3*bw*fc, 3 * fc * fc).Evaluate(gamma).Real;
 
             for (int i = 0; i < a.Length; i++)
             {
