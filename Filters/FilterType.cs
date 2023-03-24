@@ -27,7 +27,9 @@ namespace Filters
         LowPass,
         HighPass,
         BandPass,
-        BandStop
+        BandStop,
+        High,
+        Low
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]

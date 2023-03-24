@@ -134,7 +134,6 @@ namespace Filters
                 case 2:
                     v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5));
                     kappa = Math.Sinh(v_0);
-                    lambda = Math.Cosh(v_0);
                     D = new Polynomial(fc,
                         kappa*bw,
                         fc).Evaluate(gamma).Real;
