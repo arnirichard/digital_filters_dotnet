@@ -47,40 +47,42 @@ namespace Filters
             switch (order)
             {
                 case 2:
-                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5));
+                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, 0.5));
                     kappa = Math.Sinh(v_0);
-                    lambda = Math.Cosh(v_0);
-                    D = new Polynomial(fc * kappa,
-                        bw,
-                        kappa * fc).Evaluate(gamma).Real;
-                    b[0] = fc * kappa * (gamma * gamma + 1);
-                    b[1] = 2 * fc * kappa * (gamma * gamma - 1);
+                    D = new Polynomial(fc,
+                        bw*kappa,
+                        fc).Evaluate(gamma).Real;
+                    b[0] = fc * (gamma * gamma + 1);
+                    b[1] = 2 * fc * (gamma * gamma - 1);
                     b[2] = b[0];
-                    a[0] = 2 * kappa * fc * (gamma * gamma - 1);
-                    a[1] = kappa * fc * gamma * gamma - bw * gamma + kappa * fc;
+                    a[0] = b[1];
+                    a[1] = fc*gamma*gamma-bw*kappa*gamma+fc;
                     break;
                 case 4:
                 default:
-                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, -0.5)) / 2;
+                    v_0 = Math.Asinh(Math.Pow(Math.Pow(10, R / 10) - 1, 0.5)) / 2;
                     kappa = Math.Sinh(v_0);
                     lambda = Math.Cosh(v_0);
-                    D = fc * fc * (kappa * kappa + lambda * lambda)
-                        + 2 * Math.Sqrt(2) * bw * fc * kappa * gamma * (gamma * gamma + 1)
-                        + 2 * (bw * bw + fc * fc * (kappa * kappa + lambda * lambda)) * gamma * gamma;
+                    D = new Polynomial(
+                        2*fc*fc,
+                        2*Math.Sqrt(2)*kappa*fc*bw,
+                        4*fc*fc+bw*bw*(kappa*kappa+lambda*lambda),
+                        2 * Math.Sqrt(2) * kappa * fc* bw,
+                        2*fc*fc
+                    ).Evaluate(gamma).Real;
 
-                    b[0] = fc * fc * (kappa * kappa + lambda * lambda) * (Math.Pow(gamma, 4) + 2 * gamma * gamma + 1);
-                    b[1] = 4 * fc * fc * (kappa * kappa + lambda * lambda) * (Math.Pow(gamma, 4) - 1);
-                    b[2] = 2 * fc * fc * (lambda * lambda + kappa * kappa) * (3 * Math.Pow(gamma, 4) - 2 * gamma * gamma + 3);
+                    b[0] = 2*fc*fc*Math.Pow(gamma, 4)+(4*fc*fc+bw*bw)*gamma*gamma+2*fc*fc;
+                    b[1] = 8*fc*fc*(Math.Pow(gamma, 4)-1);
+                    b[2] = 2*(6*fc*fc*Math.Pow(gamma,4)-(4*fc*fc+bw*bw)*gamma*gamma+6*fc*fc);
                     b[3] = b[1];
                     b[4] = b[0];
-                    a[0] = 4 * fc * fc * (lambda * lambda + kappa * kappa) * (Math.Pow(gamma, 4) - 1) + 4 * Math.Sqrt(2) * bw * fc * kappa * gamma * (gamma * gamma - 1);
-                    a[1] = 6 * fc * fc * (lambda * lambda + kappa * kappa) * (Math.Pow(gamma, 4) + 1)
-                        - 4 * (fc * fc * (kappa * kappa + lambda * lambda) + bw * bw) * lambda * lambda;
-                    a[2] = 4 * fc * fc * (kappa * kappa + lambda * lambda) * (Math.Pow(gamma, 4) - 1)
-                        - 4 * Math.Sqrt(2) * bw * fc * kappa * lambda * (lambda * lambda - 1);
-                    a[3] = fc * fc * (kappa * kappa + lambda * lambda) * (Math.Pow(gamma, 4) + 1)
-                        - 2 * Math.Sqrt(2) * bw * fc * kappa * gamma * (gamma * gamma + 1)
-                        + 2 * (2 * bw + fc * fc * (kappa * kappa + lambda * lambda)) * gamma * gamma;
+                    a[0] = 4 * fc*(2*fc*Math.Pow(gamma,4)+Math.Sqrt(2)*kappa*bw*(gamma*gamma-1)*gamma-2*fc);
+                    a[1] = 2*(6*fc*fc*Math.Pow(gamma, 4)-(4*fc*fc+bw*bw*(kappa*kappa+lambda*lambda))*gamma*gamma+6*fc*fc);
+                    a[2] = 4*fc*(2*fc*Math.Pow(gamma, 4)-Math.Sqrt(2)*kappa*bw*(gamma*gamma-1)*gamma-2*fc);
+                    a[3] = 2*fc*fc*Math.Pow(gamma, 4)
+                        -2*Math.Sqrt(2)*kappa*fc*bw*(gamma*gamma+1)*gamma+
+                        (4*fc*fc+bw*bw*(kappa*kappa+lambda*lambda))*gamma*gamma
+                        +2*fc*fc;
                     break;
             }
 
