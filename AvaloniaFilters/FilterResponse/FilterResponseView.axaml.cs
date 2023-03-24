@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using DynamicData.Binding;
 using Filters;
 using System;
@@ -13,7 +14,7 @@ namespace AvaloniaFilters
         {
             InitializeComponent();
 
-            DataContext = new FilterResponseViewModel();
+            DataContext = new FilterResponseViewModel();         
 
             filterTypeCombo.SelectionChanged += FilterTypeCombo_SelectionChanged;
             filterTypeCombo.Items = Enum.GetValues(typeof(FilterType)).Cast<FilterType>();
@@ -27,12 +28,18 @@ namespace AvaloniaFilters
             gainSlider.PropertyChanged += Slider_PropertyChanged;
             qSlider.PropertyChanged += Slider_PropertyChanged;
             rippleFactorSlider.PropertyChanged += Slider_PropertyChanged;
+            samplingFreqSlider.PropertyChanged += Slider_PropertyChanged;
+
+            samplingFreqTextBox.PointerWheelChanged += TextBox_PointerWheelChanged;
+            cutoffFreqTextBox.PointerWheelChanged += TextBox_PointerWheelChanged;
+            bwTextBox.PointerWheelChanged += TextBox_PointerWheelChanged;
 
             cutoffFreqSlider.PointerWheelChanged += Slider_PointerWheelChanged;
             bandwidthSlider.PointerWheelChanged += Slider_PointerWheelChanged;
             gainSlider.PointerWheelChanged += Slider_PointerWheelChanged;
             qPanel.PointerWheelChanged += Slider_PointerWheelChanged;
             rippleFactorSlider.PointerWheelChanged += Slider_PointerWheelChanged;
+            samplingFreqSlider.PointerWheelChanged += Slider_PointerWheelChanged; 
 
             magnitudePlot.HorizontalLines = new LinesDefinition[]
             {
@@ -67,11 +74,22 @@ namespace AvaloniaFilters
             UpdatePanelVisibility();
         }
 
+        private void TextBox_PointerWheelChanged(object? sender, PointerWheelEventArgs e)
+        {
+            if (sender == samplingFreqTextBox)
+                Slider_PointerWheelChanged(samplingFreqSlider, e);
+            else if (sender == cutoffFreqTextBox)
+                Slider_PointerWheelChanged(cutoffFreqSlider, e);
+            else if (sender == bwTextBox)
+                Slider_PointerWheelChanged(bandwidthSlider, e);
+        }
+
         private void Slider_PointerWheelChanged(object? sender, Avalonia.Input.PointerWheelEventArgs e)
         {
             if(sender is Slider slider)
             {
                 slider.Value += e.Delta.Y * slider.SmallChange;
+                slider.Focus();
             }
         }
 
@@ -86,6 +104,11 @@ namespace AvaloniaFilters
         {
             if(e.Property == Slider.ValueProperty)
             {
+                if(sender == samplingFreqSlider)
+                {
+                    cutoffFreqSlider.Maximum = samplingFreqSlider.Value / 2 - 1;
+                }
+
                 CreateFilter();
             }
         }

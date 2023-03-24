@@ -39,7 +39,20 @@ namespace AvaloniaFilters
 
     internal class FilterResponseViewModel : ViewModelBase
     {
-        public int Fs { get; set; } = 10000;
+        int fs = 10000;
+        public int Fs 
+        {
+            get => fs;
+
+            set
+            {
+                if (fs != value)
+                { 
+                    fs = value;
+                    this.RaisePropertyChanged("Fs");
+                }
+            }
+        }
         public CanvasItem[]? Zeros { get; set; }
         public CanvasItem[]? Poles { get; set; }
         public IIRFilter? Filter { get; set; }

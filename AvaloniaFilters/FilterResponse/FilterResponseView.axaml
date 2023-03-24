@@ -4,6 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:local="using:AvaloniaFilters" 
              x:Class="AvaloniaFilters.FilterResponseView">
+	<UserControl.Styles>
+		<Style Selector="Slider">
+			<Setter Property="Height" Value="30" />
+			<Setter Property="Margin" Value="10, 0" />
+		</Style>
+	</UserControl.Styles>
+	<UserControl.Resources>
+		<local:IntegerOnlyConverter x:Key="integerConverter"/>
+	</UserControl.Resources>
+	
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition />
@@ -16,11 +26,20 @@
 
 		<ScrollViewer VerticalScrollBarVisibility="Auto" Grid.RowSpan="2">
 			<StackPanel Orientation="Vertical" >
+				<TextBlock VerticalAlignment="Center" Margin="10">Change the values using mouse wheel, slider or text box.</TextBlock>
+				
 				<WrapPanel>
 					<TextBlock VerticalAlignment="Center" Margin="10">Sampling frequency: </TextBlock>
-					<TextBlock VerticalAlignment="Center" Margin="10"
-							   Text="{Binding Fs}"/>
+					<TextBox x:Name="samplingFreqTextBox" VerticalAlignment="Center" Margin="10" MinWidth="50"
+							 HorizontalContentAlignment="Center"
+							   Text="{Binding Fs, Mode=TwoWay, Converter={StaticResource integerConverter}}"/>
 				</WrapPanel>
+				<Slider x:Name="samplingFreqSlider" Value="{Binding Fs, Mode=TwoWay}"
+					Minimum="20" Maximum="50000" TickFrequency="10"
+					SmallChange="10"
+					IsSnapToTickEnabled="True"
+					HorizontalAlignment="Stretch"
+				/>
 				<WrapPanel>
 					<TextBlock VerticalAlignment="Center" Margin="10">Filter</TextBlock>
 					<ComboBox x:Name="filterTypeCombo" SelectedIndex="0" Margin="10" MinWidth="100"/>
@@ -32,7 +51,8 @@
 				</WrapPanel>
 				<WrapPanel>
 					<TextBlock VerticalAlignment="Center" Margin="10">Cut off frequency:</TextBlock>
-					<TextBlock x:Name="cutoffFreqTextBlock" VerticalAlignment="Center" Margin="10"
+					<TextBox x:Name="cutoffFreqTextBox" VerticalAlignment="Center" Margin="10"  MinWidth="50"
+							 HorizontalContentAlignment="Center"
 							   Text="{Binding Value,ElementName=cutoffFreqSlider}"/>
 				</WrapPanel>
 				<Slider x:Name="cutoffFreqSlider" Value="1000"
@@ -40,12 +60,13 @@
 					SmallChange="10" 
 					IsSnapToTickEnabled="True"
 					HorizontalAlignment="Stretch"
-					Margin="10, 0"
 				/>
 				<StackPanel x:Name="bwPanel">
 					<WrapPanel>
 						<TextBlock VerticalAlignment="Center" Margin="10">Bandwidth:</TextBlock>
-						<TextBlock VerticalAlignment="Center" Margin="10"
+						<TextBox x:Name="bwTextBox" VerticalAlignment="Center" Margin="10"
+								  MinWidth="50"
+							 HorizontalContentAlignment="Center"
 								   Text="{Binding Value,ElementName=bandwidthSlider}"/>
 					</WrapPanel>
 
@@ -54,7 +75,6 @@
 						SmallChange="10"
 						IsSnapToTickEnabled="True"
 						HorizontalAlignment="Stretch"
-						Margin="10, 0"
 					/>
 				</StackPanel>
 
@@ -70,7 +90,6 @@
 						SmallChange="1"
 						IsSnapToTickEnabled="True"
 						HorizontalAlignment="Stretch"
-						Margin="10, 0"
 					/>
 				</StackPanel>
 
@@ -86,7 +105,6 @@
 						SmallChange="1"
 						IsSnapToTickEnabled="True"
 						HorizontalAlignment="Stretch"
-						Margin="10, 0"
 					/>
 				</StackPanel>
 
