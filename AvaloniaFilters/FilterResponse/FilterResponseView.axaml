@@ -67,7 +67,7 @@
 
 					<Slider x:Name="gainSlider" Value="3"
 						Minimum="-30" Maximum="30" TickFrequency="1"
-						SmallChange="11"
+						SmallChange="1"
 						IsSnapToTickEnabled="True"
 						HorizontalAlignment="Stretch"
 						Margin="10, 0"
@@ -99,7 +99,7 @@
 
 					<Slider x:Name="qSlider" Value="1"
 						Minimum="0" Maximum="10" TickFrequency="0.1"
-						SmallChange="1"
+						SmallChange="0.05"
 						IsSnapToTickEnabled="True"
 						HorizontalAlignment="Stretch"
 						Margin="10, 0"

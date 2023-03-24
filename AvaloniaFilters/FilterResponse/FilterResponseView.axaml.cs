@@ -28,6 +28,12 @@ namespace AvaloniaFilters
             qSlider.PropertyChanged += Slider_PropertyChanged;
             rippleFactorSlider.PropertyChanged += Slider_PropertyChanged;
 
+            cutoffFreqSlider.PointerWheelChanged += Slider_PointerWheelChanged;
+            bandwidthSlider.PointerWheelChanged += Slider_PointerWheelChanged;
+            gainSlider.PointerWheelChanged += Slider_PointerWheelChanged;
+            qPanel.PointerWheelChanged += Slider_PointerWheelChanged;
+            rippleFactorSlider.PointerWheelChanged += Slider_PointerWheelChanged;
+
             magnitudePlot.HorizontalLines = new LinesDefinition[]
             {
                 new LinesDefinition(0, 1, true, Plot.Beige),
@@ -59,6 +65,14 @@ namespace AvaloniaFilters
             };
 
             UpdatePanelVisibility();
+        }
+
+        private void Slider_PointerWheelChanged(object? sender, Avalonia.Input.PointerWheelEventArgs e)
+        {
+            if(sender is Slider slider)
+            {
+                slider.Value += e.Delta.Y * slider.SmallChange;
+            }
         }
 
         private void FilterPassTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
