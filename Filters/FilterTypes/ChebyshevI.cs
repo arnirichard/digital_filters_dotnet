@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Filters
 {
-    public class ChebychevI
+    public class ChebyshevI
     {
         public static readonly double Alpha = Math.Cos(5 * Math.PI / 8);
         public static readonly double Beta = Math.Cos(7 * Math.PI / 8);
