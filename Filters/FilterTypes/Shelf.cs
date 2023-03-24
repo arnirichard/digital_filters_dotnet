@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Filters
 {
-    internal class Shelf
+    public static class Shelf
     {
+        [IIRFilterAttr(FilterType.Shelf, FilterPassType.None, 1, 2)]
+        public static IIRFilter Create(FilterParameters filterParameters)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

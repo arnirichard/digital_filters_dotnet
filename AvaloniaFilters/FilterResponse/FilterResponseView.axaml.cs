@@ -104,9 +104,10 @@ namespace AvaloniaFilters
         {
             bwPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft6 &&
                 filterPassTypeCombo.SelectedItem is FilterPassType pt &&
-                (pt == FilterPassType.BandPass || pt == FilterPassType.BandStop || ft6 == FilterType.Equalization);
+                (pt == FilterPassType.BandPass || pt == FilterPassType.BandStop || 
+                ft6 == FilterType.Equalization || ft6 == FilterType.Notch);
             linearGainPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft &&
-                ft == FilterType.Equalization;
+                (ft == FilterType.Equalization || ft == FilterType.Shelf);
             rippleFactorPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft2 &&
                 (ft2 == FilterType.ChebyshevTypeI | ft2 == FilterType.ChebyshevTypeII);
             qPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft3 &&
