@@ -1,5 +1,5 @@
 # digital_filters_dotnet
-Create various digital filters and analyse their behaviour
+Select a filter type and configuration, and view magnitude and phase plot, and zeros&poles plot
 
         Butterworth,
         LinkwitzReilly,
