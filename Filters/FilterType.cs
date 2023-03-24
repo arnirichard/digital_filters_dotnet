@@ -12,12 +12,12 @@ namespace Filters
         Butterworth,
         LinkwitzReilly,
         Bessel,
-        ChebychevTypeI,
-        ChebychevTypeII,
+        ChebyshevTypeI,
+        ChebyshevTypeII,
         VariableQ,
         AllPass,
         Equalization,
-        Notch,
+        Notch,  
         Shelf
     }
 

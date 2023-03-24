@@ -94,7 +94,7 @@ namespace AvaloniaFilters
             linearGainPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft &&
                 ft == FilterType.Equalization;
             rippleFactorPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft2 &&
-                (ft2 == FilterType.ChebychevTypeI | ft2 == FilterType.ChebychevTypeII);
+                (ft2 == FilterType.ChebyshevTypeI | ft2 == FilterType.ChebyshevTypeII);
             qPanel.IsVisible = filterTypeCombo.SelectedItem is FilterType ft3 &&
                 ft3 == FilterType.VariableQ;
         }
