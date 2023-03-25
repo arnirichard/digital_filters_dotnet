@@ -132,7 +132,7 @@ namespace AvaloniaFilters
                     double[] x = vm.X ?? 1D.GetLinearRange(vm.Y.Length, vm.Y.Length);
                     NumberRange<double> yDisplayRange = new NumberRange<double>(
                                 Math.Min(MaxYDisplayRangeStart ?? vm.YRange.Start, Math.Max(MinYDisplayRangeStart ?? vm.YRange.Start, vm.YRange.Start)),
-                                Math.Max(MinYDisplayRangeEnd ?? vm.YRange.End+1, vm.YRange.End+1));
+                                Math.Max(MinYDisplayRangeEnd ?? vm.YRange.End, vm.YRange.End));
 
                     AxisData yAxisData = new AxisData(vm.Y, vm.YRange, yDisplayRange, (int)YScaleType);
                     AxisData xAxisData = new AxisData(x, xRange, xRange, (int)XScaleType);

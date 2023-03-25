@@ -50,11 +50,10 @@ namespace AvaloniaFilters
             };
             phasePlot.HorizontalLines = new LinesDefinition[]
             {
-                new LinesDefinition(0, 1, true, Plot.Beige),
-                new LinesDefinition(0, (float)Math.PI, true, Plot.Beige),
+                new LinesDefinition(0, (float)Math.PI/4, true, Plot.Beige),
             };
-            phasePlot.MinYDisplayRangeEnd = Math.PI;
-            phasePlot.MaxYDisplayRangeStart = -Math.PI;
+            phasePlot.MinYDisplayRangeEnd = Math.PI/2+0.1;
+            phasePlot.MaxYDisplayRangeStart = -Math.PI/2-0.1;
 
             magnitudePlot.MinYDisplayRangeStart = -100;
             magnitudePlot.MinYDisplayRangeEnd = 1;
