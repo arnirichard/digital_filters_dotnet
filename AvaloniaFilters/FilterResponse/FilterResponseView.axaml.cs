@@ -50,10 +50,11 @@ namespace AvaloniaFilters
             };
             phasePlot.HorizontalLines = new LinesDefinition[]
             {
-                new LinesDefinition(0, 10, true, Plot.Beige),
-                new LinesDefinition(0, 25, true, Plot.Beige),
-                new LinesDefinition(0, 50, true, Plot.Beige),
+                new LinesDefinition(0, 1, true, Plot.Beige),
+                new LinesDefinition(0, (float)Math.PI, true, Plot.Beige),
             };
+            phasePlot.MinYDisplayRangeEnd = Math.PI;
+            phasePlot.MaxYDisplayRangeStart = -Math.PI;
 
             magnitudePlot.MinYDisplayRangeStart = -100;
             magnitudePlot.MinYDisplayRangeEnd = 1;
@@ -68,9 +69,13 @@ namespace AvaloniaFilters
                 new LinesDefinition(500, 0, true, Plot.Beige),
                 new LinesDefinition(1000, 0, true, Plot.Beige),
                 new LinesDefinition(2000, 0, true, Plot.Beige),
-                new LinesDefinition(4000, 0, true, Plot.Beige)
+                new LinesDefinition(4000, 0, true, Plot.Beige),
+                new LinesDefinition(8000, 0, true, Plot.Beige),
+                new LinesDefinition(16000, 0, true, Plot.Beige),
+                new LinesDefinition(32000, 0, true, Plot.Beige)
             };
 
+            SetMaximumSliderValues();
             UpdatePanelVisibility();
         }
 
@@ -106,7 +111,7 @@ namespace AvaloniaFilters
             {
                 if(sender == samplingFreqSlider)
                 {
-                    cutoffFreqSlider.Maximum = samplingFreqSlider.Value / 2 - 1;
+                    SetMaximumSliderValues();
                 }
 
                 CreateFilter();
@@ -121,6 +126,12 @@ namespace AvaloniaFilters
         private void FilterTypeCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             UpdatePassTypeCombo();
+        }
+
+        void SetMaximumSliderValues()
+        {
+            cutoffFreqSlider.Maximum = samplingFreqSlider.Value / 2 - 1;
+            bandwidthSlider.Maximum = samplingFreqSlider.Value / 4;
         }
 
         void UpdatePanelVisibility()

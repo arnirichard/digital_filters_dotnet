@@ -50,7 +50,7 @@ namespace AvaloniaFilters
                     double val = linesDefinition.Value - linesDefinition.Interval * (int)((linesDefinition.Value - range.Start) / linesDefinition.Interval);
                     int pos;
 
-                    int lastPos = writeableBitmap.PixelSize.Height;
+                    int lastPos = int.MaxValue;
 
                     while (val < range.End)
                     {

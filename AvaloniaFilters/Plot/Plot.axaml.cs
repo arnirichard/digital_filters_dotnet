@@ -29,7 +29,7 @@ namespace AvaloniaFilters
         public static uint Blue = uint.Parse("FF0000FF", System.Globalization.NumberStyles.HexNumber);
         public ScaleType YScaleType { get; set; } = ScaleType.Linear;
         public ScaleType XScaleType { get; set; } = ScaleType.Linear;
-        public double? MinYDisplayRangeEnd, MinYDisplayRangeStart;
+        public double? MinYDisplayRangeEnd, MinYDisplayRangeStart, MaxYDisplayRangeStart;
         public LinesDefinition[]? HorizontalLines { get; set; }
         public LinesDefinition[]? VerticalLines { get; set; }
         public string? XUnit, YUnit;
@@ -84,9 +84,10 @@ namespace AvaloniaFilters
 
             foreach (var plotLine in plotLines)
             {
+                double value = plotLine.Value >= 1000 ? plotLine.Value / 1000 : plotLine.Value;
                 TextBlock textBlock = new TextBlock()
                 {
-                    Text = plotLine.Value.ToString("0.###") + ((below ? XUnit : YUnit) ?? ""),
+                    Text = value.ToString("0.###") + (plotLine.Value >= 1000 ? "k" : "") +((below ? XUnit : YUnit) ?? ""),
                     TextAlignment = TextAlignment.Center,
                     Foreground = new SolidColorBrush(Colors.Black)
                 };
@@ -130,7 +131,7 @@ namespace AvaloniaFilters
                     NumberRange<double> xRange = vm.XRange ?? new NumberRange<double>(1, vm.Y.Length);
                     double[] x = vm.X ?? 1D.GetLinearRange(vm.Y.Length, vm.Y.Length);
                     NumberRange<double> yDisplayRange = new NumberRange<double>(
-                                Math.Max(MinYDisplayRangeStart ?? vm.YRange.Start, vm.YRange.Start),
+                                Math.Min(MaxYDisplayRangeStart ?? vm.YRange.Start, Math.Max(MinYDisplayRangeStart ?? vm.YRange.Start, vm.YRange.Start)),
                                 Math.Max(MinYDisplayRangeEnd ?? vm.YRange.End+1, vm.YRange.End+1));
 
                     AxisData yAxisData = new AxisData(vm.Y, vm.YRange, yDisplayRange, (int)YScaleType);
