@@ -10,7 +10,7 @@ namespace Filters
 {
     public class IIRFilter
     {
-        // y_n = b_0 * x_n + b_1 * x_n-1 + ... + b_k * x_n-k + a_0 * y_n-1 + a_1 * y_n-2 + ... + a_m * y_n-m-1
+        // y_n = b_0 * x_n + b_1 * x_n-1 + ... + b_k * x_n-k - a_0 * y_n-1 - a_1 * y_n-2 - ... - a_m * y_n-m-1
         // H(z) = nominator/denominator
         // nominator = b_0 + b_1*z^-1 + ... + b_k*z^-k
         // denominator = 1 + a_0*z^-1 + ... + a_m * z^(-m-1)
@@ -138,21 +138,21 @@ namespace Filters
         {
             T[] result = new T[input.Length];
 
-            double[] x = new double[A.Length];
-            double[] y = new double[B.Length];
+            double[] x = new double[B.Length];
+            double[] y = new double[A.Length];
             double val;
 
             for (int i = 0; i < input.Length; i++)
             {
                 val = 0;
 
-                x[i % x.Length] = double.CreateSaturating(input[i]); // / gain;
+                x[i % x.Length] = double.CreateSaturating(input[i]);
+
+                for (int j = 0; j < B.Length; j++)
+                    val += x[(i-j+B.Length) % B.Length] * B[j];
 
                 for (int j = 0; j < A.Length; j++)
-                    val += x[(j + i + 1) % A.Length] * A[i];
-
-                for (int j = 0; j < B.Length - 1; j++)
-                    val -= y[(j + i + 1) % A.Length] * A[i];
+                    val -= y[(i - j - 1+A.Length) % A.Length] * A[j];
 
                 y[i % y.Length] = val;
 
@@ -170,16 +170,16 @@ namespace Filters
 
             for (int i = 0; i < B.Length; i++)
             {
-                sb.Append((B[0] < 0 ? "- " : (i > 0 ? " + " : "")) + string.Format("{0}x_n{1}",
-                    Math.Abs(B[0]),
+                sb.Append((B[i] < 0 ? "- " : (i > 0 ? " + " : "")) + string.Format("{0}x_n{1}",
+                    Math.Abs(B[i]),
                     i == 0 ? "" : -i));
             }
 
             for (int i = 0; i < A.Length; i++)
             {
-                sb.Append((A[0] < 0 ? " - " : " + ") +
+                sb.Append((A[i] < 0 ? " - " : " + ") +
                     string.Format("{0}y_n{1}",
-                        Math.Abs(A[0]),
+                        Math.Abs(A[i]),
                         -(i + 1)));
             }
 

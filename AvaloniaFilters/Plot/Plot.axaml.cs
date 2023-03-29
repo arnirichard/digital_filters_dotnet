@@ -128,13 +128,13 @@ namespace AvaloniaFilters
                         Avalonia.Platform.PixelFormat.Bgra8888,
                         Avalonia.Platform.AlphaFormat.Unpremul);
 
-                    NumberRange<double> xRange = vm.XRange ?? new NumberRange<double>(1, vm.Y.Length);
-                    double[] x = vm.X ?? 1D.GetLinearRange(vm.Y.Length, vm.Y.Length);
                     NumberRange<double> yDisplayRange = new NumberRange<double>(
                                 Math.Min(MaxYDisplayRangeStart ?? vm.YRange.Start, Math.Max(MinYDisplayRangeStart ?? vm.YRange.Start, vm.YRange.Start)),
                                 Math.Max(MinYDisplayRangeEnd ?? vm.YRange.End, vm.YRange.End));
-
                     AxisData yAxisData = new AxisData(vm.Y, vm.YRange, yDisplayRange, (int)YScaleType);
+
+                    double[] x = vm.X ?? 1D.GetLinearRange(vm.Y.Length, vm.Y.Length);
+                    NumberRange<double> xRange = vm.XRange ?? new NumberRange<double>(1, vm.Y.Length);
                     AxisData xAxisData = new AxisData(x, xRange, xRange, (int)XScaleType);
 
                     List<PlotLine> horizontalPlotLines = new();
