@@ -22,6 +22,9 @@ namespace Filters
         public readonly Polynomial Nominator, Denominator;        
 
         static Dictionary<IIRFilterAttr, MethodInfo> filterCreators = new();
+        double[] x, y;
+        int index;
+        public double LastOutput;
 
         public IIRFilter(double[] a, double[] b, FilterParameters filterParameters)
         {
@@ -35,6 +38,23 @@ namespace Filters
             Denominator = new Polynomial(denomCoeffs.ToArray());
             Poles = Denominator.Roots();
             Zeros = Nominator.Roots();
+            x = new double[B.Length];
+            y = new double[A.Length];
+        }
+
+        public IIRFilter(Complex[] zeros, Complex[] poles, FilterParameters parameters)
+        {
+            Parameters = parameters;
+            Poles = poles;
+            Zeros = zeros;
+            Nominator = Polynomial.FromRoots(zeros);
+            Denominator = Polynomial.FromRoots(poles);
+            B = Nominator.Coefficients.Select(c => c.Real).ToArray();
+            A = Denominator.Coefficients.ToList()
+                .GetRange(1, Denominator.Coefficients.Length)
+                .Select(c => c.Real).ToArray();
+            x = new double[B.Length];
+            y = new double[A.Length];
         }
 
         static IIRFilter()
@@ -72,19 +92,6 @@ namespace Filters
             }
 
             return result;
-        }
-
-        public IIRFilter(Complex[] zeros, Complex[] poles, FilterParameters parameters)
-        {
-            Parameters = parameters;
-            Poles = poles;
-            Zeros = zeros;
-            Nominator = Polynomial.FromRoots(zeros);
-            Denominator = Polynomial.FromRoots(poles);
-            B = Nominator.Coefficients.Select(c => c.Real).ToArray();
-            A = Denominator.Coefficients.ToList()
-                .GetRange(1, Denominator.Coefficients.Length)
-                .Select(c => c.Real).ToArray();
         }
 
         public static IIRFilter? CreateFilter(FilterType type,
@@ -134,32 +141,74 @@ namespace Filters
             return new int[0];
         }
 
+        public double Filter(double input)
+        {
+            double result = 0;
+
+            x[index % x.Length] = input;
+
+            for (int j = 0; j < B.Length; j++)
+                result += x[(index - j + B.Length) % B.Length] * B[j];
+
+            for (int j = 0; j < A.Length; j++)
+                result -= y[(index - j - 1 + A.Length) % A.Length] * A[j];
+
+            y[index % y.Length] = LastOutput = result;
+
+            index++;
+
+            return LastOutput = result;
+        }
+
         public T[] Filter<T>(Span<T> input) where T : INumber<T>
         {
             T[] result = new T[input.Length];
-
-            double[] x = new double[B.Length];
-            double[] y = new double[A.Length];
             double val;
 
             for (int i = 0; i < input.Length; i++)
             {
                 val = 0;
 
-                x[i % x.Length] = double.CreateSaturating(input[i]);
+                x[index % x.Length] = double.CreateSaturating(input[i]);
 
                 for (int j = 0; j < B.Length; j++)
-                    val += x[(i-j+B.Length) % B.Length] * B[j];
+                    val += x[(index - j+B.Length) % B.Length] * B[j];
 
                 for (int j = 0; j < A.Length; j++)
-                    val -= y[(i - j - 1+A.Length) % A.Length] * A[j];
+                    val -= y[(index - j - 1+A.Length) % A.Length] * A[j];
 
-                y[i % y.Length] = val;
+                y[index % y.Length] = LastOutput = val;
+
+                index++;
 
                 result[i] = T.CreateChecked(val);
             }
 
             return result;
+        }
+
+        public void FilterInPlace<T>(Span<T> input) where T : INumber<T>
+        {
+            double val;
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                val = 0;
+
+                x[index % x.Length] = double.CreateSaturating(input[i]);
+
+                for (int j = 0; j < B.Length; j++)
+                    val += x[(index - j + B.Length) % B.Length] * B[j];
+
+                for (int j = 0; j < A.Length; j++)
+                    val -= y[(index - j - 1 + A.Length) % A.Length] * A[j];
+
+                y[index % y.Length] = LastOutput = val;
+
+                index++;
+
+                input[i] = T.CreateChecked(val);
+            }
         }
 
         public override string ToString()

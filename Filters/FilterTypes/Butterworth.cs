@@ -254,9 +254,9 @@ namespace Filters
                     break;
                 case 3:
                     D = Math.Pow(gamma, 3) + 2 * gamma * gamma + 2 * gamma + 1;
-                    b[0] = Math.Pow(gamma, 2);
-                    b[1] = 2 * b[0];
-                    b[2] = 2 * b[0];
+                    b[0] = Math.Pow(gamma, 3);
+                    b[1] = 3 * b[0];
+                    b[2] = 3 * b[0];
                     b[3] = b[0];
                     a[0] = new Polynomial(-3, -2, 2, 3).Evaluate(gamma).Real;
                     a[1] = 3 * Math.Pow(gamma, 3) - 2 * Math.Pow(gamma, 2) - 2 * gamma + 3;
