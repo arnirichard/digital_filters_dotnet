@@ -10,6 +10,8 @@ namespace Filters
 {
     public class IIRFilter
     {
+        static Dictionary<IIRFilterAttr, MethodInfo> FilterCreators = new();
+
         // y_n = b_0 * x_n + b_1 * x_n-1 + ... + b_k * x_n-k - a_0 * y_n-1 - a_1 * y_n-2 - ... - a_m * y_n-m-1
         // H(z) = nominator/denominator
         // nominator = b_0 + b_1*z^-1 + ... + b_k*z^-k
@@ -19,9 +21,11 @@ namespace Filters
         public FilterParameters Parameters { get; init; }
 
         public readonly Complex[] Poles, Zeros;
-        public readonly Polynomial Nominator, Denominator;        
+        public readonly Polynomial Nominator, Denominator;
 
-        static Dictionary<IIRFilterAttr, MethodInfo> filterCreators = new();
+        double[]? adaptStepA, adaptStepB;
+        double adaptSteps;
+
         double[] x, y;
         int index;
         public double LastOutput;
@@ -62,6 +66,44 @@ namespace Filters
             InitFilterDelegates();
         }
 
+        public void SetAdaptiveFilter(double[] a, double[] b, int samples)
+        {
+            adaptStepA = new double[a.Length];
+            for(int i = 0; i < adaptStepA.Length; i++)
+            {
+                adaptStepA[i] = (a[i] - A[i]) / samples;
+            }
+            adaptStepB = new double[b.Length];
+            for (int i = 0; i < adaptStepB.Length; i++)
+            {
+                adaptStepB[i] = (b[i] - B[i]) / samples;
+            }
+            adaptSteps = samples;
+        }
+        
+        void Adapt()
+        {
+            if(adaptSteps > 0 && adaptStepA != null && adaptStepB != null)
+            {
+                for (int i = 0; i < adaptStepA.Length; i++)
+                {
+                    A[i] += adaptStepA[i];
+                }
+                for (int i = 0; i < adaptStepB.Length; i++)
+                {
+                    B[i] += adaptStepB[i];
+                }
+                adaptSteps--;
+            }
+        }
+
+        public void Replace(IIRFilter filter)
+        {
+            x = filter.x;
+            y = filter.y;
+            index = filter.index;
+        }
+
         static void InitFilterDelegates()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -75,7 +117,7 @@ namespace Filters
                 {
                     IIRFilterAttr? attr = methodInfo.GetCustomAttributes(typeof(IIRFilterAttr), true).FirstOrDefault() as IIRFilterAttr;
                     if (attr != null)
-                        filterCreators[attr] = methodInfo;
+                        FilterCreators[attr] = methodInfo;
                 }
             }
         }
@@ -100,7 +142,7 @@ namespace Filters
         {
             MethodInfo? methodInfo;
             IIRFilterAttr attr = new IIRFilterAttr(type, passType);
-            if (filterCreators.TryGetValue(attr, out methodInfo))
+            if (FilterCreators.TryGetValue(attr, out methodInfo))
             {
                 try
                 {
@@ -115,7 +157,7 @@ namespace Filters
         {
             List<FilterPassType> result = new();
 
-            foreach (var kvp in filterCreators)
+            foreach (var kvp in FilterCreators)
             {
                 if (kvp.Key.FilterType == filterType)
                 {
@@ -128,9 +170,7 @@ namespace Filters
 
         public static int[] GetFilterOrders(FilterType filterType, FilterPassType passType)
         {
-            List<FilterPassType> result = new();
-
-            foreach (var kvp in filterCreators)
+            foreach (var kvp in FilterCreators)
             {
                 if (kvp.Key.FilterType == filterType && kvp.Key.FilterPassType == passType)
                 {
@@ -144,6 +184,8 @@ namespace Filters
         public double Filter(double input)
         {
             double result = 0;
+
+            Adapt();
 
             x[index % x.Length] = input;
 
@@ -168,6 +210,8 @@ namespace Filters
             for (int i = 0; i < input.Length; i++)
             {
                 val = 0;
+
+                Adapt();
 
                 x[index % x.Length] = double.CreateSaturating(input[i]);
 
@@ -194,6 +238,8 @@ namespace Filters
             for (int i = 0; i < input.Length; i++)
             {
                 val = 0;
+
+                Adapt();
 
                 x[index % x.Length] = double.CreateSaturating(input[i]);
 
