@@ -66,15 +66,15 @@ namespace AvaloniaFilters
 
             int width = currentWidth = (int)grid.Bounds.Width;
             int height = currentHeight = (int)grid.Bounds.Height;
-            DrawBitmapJob? wbitmap = await CreateBitmap(vm, width, height);
+            (WriteableBitmap bm, List<PlotLine> hlines, List<PlotLine> vlines)? result = await CreateBitmap(vm, width, height);
 
-            if(wbitmap != null && 
+            if(result != null && 
                 width == currentWidth &&
                 height == currentHeight)
             {
-                image.Source = wbitmap.Bitmap;
-                AddLabels(belowLabels, wbitmap.VerticalLines, true);
-                AddLabels(sideLabels, wbitmap.HorizontalLines, false);
+                image.Source = result.Value.bm;
+                AddLabels(belowLabels, result.Value.vlines, true);
+                AddLabels(sideLabels, result.Value.hlines, false);
             }
         }
 
@@ -106,17 +106,10 @@ namespace AvaloniaFilters
             }
         }
 
-        class DrawBitmapJob
+        async Task<(WriteableBitmap bm, List<PlotLine> hlines, List<PlotLine> vlines)?> CreateBitmap(PlotViewModel vm, int width, int height)
         {
-            public WriteableBitmap Bitmap;
-            public List<PlotLine> HorizontalLines;
-            public List<PlotLine> VerticalLines;
-        }
-
-        async Task<DrawBitmapJob?> CreateBitmap(PlotViewModel vm, int width, int height)
-        {
-            TaskCompletionSource<DrawBitmapJob?> taskCompletionSource =
-                new TaskCompletionSource<DrawBitmapJob?>();
+            TaskCompletionSource< (WriteableBitmap bm, List<PlotLine> hlines, List<PlotLine> vlines) ?> taskCompletionSource =
+                new TaskCompletionSource<(WriteableBitmap bm, List<PlotLine> hlines, List<PlotLine> vlines)?> ();
 
             ThreadPool.QueueUserWorkItem(delegate
             {
@@ -148,14 +141,9 @@ namespace AvaloniaFilters
 
                     writeableBitmap.PlotXY(Black, yAxisData, xAxisData);
 
-                    taskCompletionSource.SetResult(new DrawBitmapJob()
-                    {
-                        Bitmap = writeableBitmap,
-                        HorizontalLines = horizontalPlotLines,
-                        VerticalLines = verticalPlotLines
-                    });
+                    taskCompletionSource.SetResult((writeableBitmap, horizontalPlotLines, verticalPlotLines));
                 }
-                catch(Exception ex)
+                catch
                 {
                     taskCompletionSource.SetResult(null);   
                 }
