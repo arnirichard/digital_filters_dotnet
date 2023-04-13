@@ -17,7 +17,7 @@ namespace AvaloniaFilters
             DataContext = new FilterResponseViewModel();         
 
             filterTypeCombo.SelectionChanged += FilterTypeCombo_SelectionChanged;
-            filterTypeCombo.Items = Enum.GetValues(typeof(FilterType)).Cast<FilterType>();
+            filterTypeCombo.Items = Enum.GetValues(typeof(FilterType)).Cast<FilterType>().ToList();
             filterTypeCombo.SelectedIndex = 0;
 
             filterPassTypeCombo.SelectionChanged += FilterPassTypeCombo_SelectionChanged;
