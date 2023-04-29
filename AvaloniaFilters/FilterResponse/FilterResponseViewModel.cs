@@ -49,7 +49,7 @@ namespace AvaloniaFilters
                 if (fs != value)
                 { 
                     fs = value;
-                    this.RaisePropertyChanged("Fs");
+                    this.RaisePropertyChanged(nameof(Fs));
                 }
             }
         }
@@ -89,11 +89,11 @@ namespace AvaloniaFilters
                 Magnitude = Phase = null;
             }
 
-            this.RaisePropertyChanged("Zeros");
-            this.RaisePropertyChanged("Poles");
-            this.RaisePropertyChanged("Filter");
-            this.RaisePropertyChanged("Magnitude");
-            this.RaisePropertyChanged("Phase");
+            this.RaisePropertyChanged(nameof(Zeros));
+            this.RaisePropertyChanged(nameof(Poles));
+            this.RaisePropertyChanged(nameof(Filter));
+            this.RaisePropertyChanged(nameof(Magnitude));
+            this.RaisePropertyChanged(nameof(Phase));
         }
     }
 }
