@@ -131,7 +131,7 @@
 						<Line StartPoint="150, 0" EndPoint="150, 300" Stroke="Black" StrokeThickness="1"/>
 					</Canvas>
 
-					<ItemsControl Items="{Binding Zeros}" Grid.Row="1">
+					<ItemsControl ItemsSource="{Binding Zeros}" Grid.Row="1">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<Canvas Width="300" Height="300"/>
@@ -152,7 +152,7 @@
 						</ItemsControl.ItemTemplate>
 					</ItemsControl>
 
-					<ItemsControl Items="{Binding Poles}" Grid.Row="1">
+					<ItemsControl ItemsSource="{Binding Poles}" Grid.Row="1">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<Canvas Width="300" Height="300"/>
@@ -179,7 +179,7 @@
 
 				<StackPanel Margin="10" MaxWidth="300">
 					<TextBlock>Zeros:</TextBlock>
-					<ItemsControl Items="{Binding Zeros}" Grid.Row="1">
+					<ItemsControl ItemsSource="{Binding Zeros}" Grid.Row="1">
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
 								<TextBlock Text="{Binding}" TextWrapping="WrapWithOverflow" Margin="10,0"/>
@@ -190,7 +190,7 @@
 
 				<StackPanel Margin="10" MaxWidth="300">
 					<TextBlock>Poles:</TextBlock>
-					<ItemsControl Items="{Binding Poles}" Grid.Row="1">
+					<ItemsControl ItemsSource="{Binding Poles}" Grid.Row="1">
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
 								<TextBlock Text="{Binding}" TextWrapping="WrapWithOverflow" Margin="10,0"/>
